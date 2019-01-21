@@ -15,7 +15,6 @@ public class Jeeves {
     private String url;
     @Value("${jeeves.instance-id}")
     private String instanceId;
-    private Thread jeevesThread;
 
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
@@ -23,17 +22,12 @@ public class Jeeves {
         logger.info("Jeeves starts");
         logger.info("Jeeves id = " + instanceId);
         System.setProperty("jsse.enableSNIExtension", "false");
-        jeevesThread = new Thread(() -> {
-        	loginService.login();
-        });
-        jeevesThread.start();
+		loginService.login();
     }
     
     public void stop() {
     	logger.info("Jeeves stop");
         logger.info("Jeeves id = " + instanceId);
-        if(jeevesThread != null)
-        	jeevesThread.interrupt();
         loginService.logout();
     }
 }

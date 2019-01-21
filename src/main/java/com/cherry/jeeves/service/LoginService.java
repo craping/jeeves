@@ -188,7 +188,8 @@ public class LoginService {
     
     public void logout() {
     	wechatHttpServiceInternal.logout();
-    	syncServie.getMessageHandler().onLogout(cacheService.getOwner());
+    	if(cacheService.getOwner() != null)
+    		syncServie.getMessageHandler().onLogout(cacheService.getOwner());
     }
     
 }

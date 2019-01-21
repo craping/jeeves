@@ -91,7 +91,6 @@ import com.cherry.jeeves.utils.rest.StatefullRestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.sun.media.jfxmedia.logging.Logger;
 
 @Component
 class WechatHttpServiceInternal {
