@@ -1,7 +1,14 @@
 package com.cherry.jeeves.exception;
 
 public class WechatQRExpiredException extends RuntimeException {
-    public WechatQRExpiredException() {
+      
+	/**  
+	* @Fields field:field:{todo}(用一句话描述这个变量表示什么)  
+	*/  
+	    
+	private static final long serialVersionUID = -6118440850308261728L;
+
+	public WechatQRExpiredException() {
     }
 
     public WechatQRExpiredException(String message) {

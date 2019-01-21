@@ -1,5 +1,10 @@
 package com.cherry.jeeves.utils.rest;
 
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
@@ -7,13 +12,10 @@ import org.apache.http.protocol.HttpContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * RestTemplate with state. Inspired by https://stackoverflow.com/a/12840202/2364882
@@ -29,6 +31,10 @@ public class StatefullRestTemplate extends RestTemplate {
                 = new StatefullHttpComponentsClientHttpRequestFactory(httpClient, httpContext);
         super.setRequestFactory(statefullHttpComponentsClientHttpRequestFactory);
         List<HttpMessageConverter<?>> converters = this.getMessageConverters();
+        FormHttpMessageConverter formConverter = new FormHttpMessageConverter();
+        formConverter.setCharset(Charset.forName("UTF8"));
+        converters.add(formConverter);
+        
         for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 List<MediaType> mediaTypes = converter.getSupportedMediaTypes();

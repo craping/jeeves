@@ -2,6 +2,7 @@ package com.cherry.jeeves.service;
 
 import com.cherry.jeeves.domain.shared.ChatRoomMember;
 import com.cherry.jeeves.domain.shared.Contact;
+import com.cherry.jeeves.domain.shared.Member;
 import com.cherry.jeeves.domain.shared.Message;
 import com.cherry.jeeves.domain.shared.RecommendInfo;
 
@@ -9,6 +10,45 @@ import java.io.IOException;
 import java.util.Set;
 
 public interface MessageHandler {
+	
+	/**
+     * 事件：获取二维码消息
+     *
+     * @param qrData 二维码数据
+     */
+	void onQR(byte[] qrData);
+	/**
+     * 事件：用户扫码消息
+     *
+     * @param headImgBase64 扫码用户头像图片 Base64
+     */
+    void onScanning(String headImgBase64);
+    
+    /**
+     * 事件：用户确认登录消息
+     *
+     */
+    void onConfirmation();
+    /**
+     * 事件：二维码过期消息
+     *
+     */
+    void onExpired();
+    
+	/**
+     * 事件：登录消息
+     *
+     * @param message 消息体
+     */
+    void onLogin(Member member);
+    
+    /**
+     * 事件：离线消息
+     *
+     * @param message 消息体
+     */
+    void onLogout(Member member);
+    
     /**
      * 事件：收到群聊天文本消息
      *
@@ -19,18 +59,60 @@ public interface MessageHandler {
     /**
      * 事件：收到群聊天图片消息
      *
-     * @param message       消息体
-     * @param thumbImageUrl 图片缩略图链接
-     * @param fullImageUrl  图片完整图链接
+     * @param message		消息体
+     * @param thumbImageUrl	图片缩略图链接
+     * @param fullImageUrl	图片完整图链接
      */
     void onReceivingChatRoomImageMessage(Message message, String thumbImageUrl, String fullImageUrl);
-
+    
+    /**
+     * 事件：收到群聊天表情消息
+     *
+     * @param message		消息体
+     * @param emoticonUrl	表情图片链接
+     */
+    void onReceivingChatRoomEmoticonMessage(Message message, String emoticonUrl);
+    
+    /**
+     * 事件：收到群聊天语音消息
+     *
+     * @param message		消息体
+     * @param thumbImageUrl	语音链接
+     */
+    void onReceivingChatRoomVoiceMessage(Message message, String voiceUrl);
+    
+    /**
+     * 事件：收到群聊天视频消息
+     *
+     * @param message		消息体
+     * @param thumbImageUrl	视频缩略图链接
+     * @param videoUrl		视频链接
+     */
+    void onReceivingChatRoomVideoMessage(Message message, String thumbImageUrl, String videoUrl);
+    
+    
+    /**
+     * 事件：收到群聊天文件消息
+     *
+     * @param message		消息体
+     * @param mediaUrl 		文件链接
+     */
+    void onReceivingChatRoomMediaMessage(Message message, String mediaUrl);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * 事件：收到个人聊天文本消息
      *
-     * @param message 消息体
+     * @param message	消息体
      */
-    void onReceivingPrivateTextMessage(Message message) throws IOException;
+    void onReceivingPrivateTextMessage(Message message);
 
     /**
      * 事件：收到个人聊天图片消息
@@ -39,8 +121,54 @@ public interface MessageHandler {
      * @param thumbImageUrl 图片缩略图链接
      * @param fullImageUrl  图片完整图链接
      */
-    void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl) throws IOException;
-
+    void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl);
+    
+    /**
+     * 事件：收到个人聊天表情消息
+     *
+     * @param message       消息体
+     * @param thumbImageUrl 图片缩略图链接
+     * @param fullImageUrl  图片完整图链接
+     */
+    void onReceivingPrivateEmoticonMessage(Message message, String emoticonUrl);
+    
+    /**
+     * 事件：收到个人聊天语音消息
+     *
+     * @param message		消息体
+     * @param thumbImageUrl	语音链接
+     */
+    void onReceivingPrivateVoiceMessage(Message message, String voiceUrl);
+    
+    /**
+     * 事件：收到个人聊天视频消息
+     *
+     * @param message		消息体
+     * @param thumbImageUrl	视频缩略图链接
+     * @param videoUrl		视频链接
+     */
+    void onReceivingPrivateVideoMessage(Message message, String thumbImageUrl, String videoUrl);
+    
+    
+    /**
+     * 事件：收到个人聊天文件消息
+     *
+     * @param message		消息体
+     * @param mediaUrl 		文件链接
+     */
+    void onReceivingPrivateMediaMessage(Message message, String mediaUrl);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * 事件：收到加好友邀请
      *

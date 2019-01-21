@@ -3,6 +3,8 @@ package com.cherry.jeeves.service;
 import com.cherry.jeeves.domain.response.*;
 import com.cherry.jeeves.domain.shared.ChatRoomDescription;
 import com.cherry.jeeves.domain.shared.Contact;
+import com.cherry.jeeves.domain.shared.Message;
+import com.cherry.jeeves.enums.MessageType;
 import com.cherry.jeeves.enums.StatusNotifyCode;
 import com.cherry.jeeves.exception.WechatException;
 import com.cherry.jeeves.utils.WechatUtils;
@@ -27,7 +29,7 @@ public class WechatHttpService {
      * @throws IOException if logout fails
      */
     public void logout() throws IOException {
-        wechatHttpServiceInternal.logout(cacheService.getHostUrl(), cacheService.getsKey());
+        wechatHttpServiceInternal.logout();
     }
 
     /**
@@ -40,7 +42,7 @@ public class WechatHttpService {
         Set<Contact> contacts = new HashSet<>();
         long seq = 0;
         do {
-            GetContactResponse response = wechatHttpServiceInternal.getContact(cacheService.getHostUrl(), cacheService.getsKey(), seq);
+            GetContactResponse response = wechatHttpServiceInternal.getContact(seq);
             WechatUtils.checkBaseResponse(response);
             seq = response.getSeq();
             contacts.addAll(response.getMemberList());
@@ -48,7 +50,7 @@ public class WechatHttpService {
         while (seq > 0);
         return contacts;
     }
-
+    
     /**
      * Send plain text to a contact (not chatroom)
      *
@@ -58,10 +60,33 @@ public class WechatHttpService {
      */
     public void sendText(String userName, String content) throws IOException {
         notifyNecessary(userName);
-        SendMsgResponse response = wechatHttpServiceInternal.sendText(cacheService.getHostUrl(), cacheService.getBaseRequest(), content, cacheService.getOwner().getUserName(), userName);
-        WechatUtils.checkBaseResponse(response);
+        wechatHttpServiceInternal.sendText(userName, content);
     }
-
+    
+    public void sendImage(String userName, String imgUrl) throws IOException {
+        notifyNecessary(userName);
+        wechatHttpServiceInternal.sendImage(userName, imgUrl);
+    }
+    
+    public void sendEmoticon(String userName, String emoticonUrl) throws IOException {
+        notifyNecessary(userName);
+        wechatHttpServiceInternal.sendEmoticon(userName, emoticonUrl);
+    }
+    
+    public void sendVideo(String userName, String videoUrl) throws IOException {
+        notifyNecessary(userName);
+        wechatHttpServiceInternal.sendVideo(userName, videoUrl);
+    }
+    
+    public void sendApp(String userName, String mediaUrl) throws IOException {
+        notifyNecessary(userName);
+        wechatHttpServiceInternal.sendApp(userName, mediaUrl);
+    }
+    
+    public void forwardMsg(String userName, Message message) throws IOException {
+        notifyNecessary(userName);
+        wechatHttpServiceInternal.forwardMsg(userName, message);
+    }
     /**
      * Set the alias of a contact
      *
@@ -70,7 +95,7 @@ public class WechatHttpService {
      * @throws IOException if setAlias fails
      */
     public void setAlias(String userName, String newAlias) throws IOException {
-        OpLogResponse response = wechatHttpServiceInternal.setAlias(cacheService.getHostUrl(), cacheService.getBaseRequest(), newAlias, userName);
+        OpLogResponse response = wechatHttpServiceInternal.setAlias(newAlias, userName);
         WechatUtils.checkBaseResponse(response);
     }
 
@@ -88,7 +113,7 @@ public class WechatHttpService {
                     description.setUserName(x);
                     return description;
                 }).toArray(ChatRoomDescription[]::new);
-        BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(cacheService.getHostUrl(), cacheService.getBaseRequest(), descriptions);
+        BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
         WechatUtils.checkBaseResponse(response);
         return response.getContactList();
     }
@@ -102,13 +127,13 @@ public class WechatHttpService {
      * @throws IOException
      */
     public void createChatRoom(String[] userNames, String topic) throws IOException {
-        CreateChatRoomResponse response = wechatHttpServiceInternal.createChatRoom(cacheService.getHostUrl(), cacheService.getBaseRequest(), userNames, topic);
+        CreateChatRoomResponse response = wechatHttpServiceInternal.createChatRoom(userNames, topic);
         WechatUtils.checkBaseResponse(response);
         //invoke BatchGetContact after CreateChatRoom
         ChatRoomDescription description = new ChatRoomDescription();
         description.setUserName(response.getChatRoomName());
         ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
-        BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(cacheService.getHostUrl(), cacheService.getBaseRequest(), descriptions);
+        BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(descriptions);
         WechatUtils.checkBaseResponse(batchGetContactResponse);
         cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
     }
@@ -121,7 +146,7 @@ public class WechatHttpService {
      * @throws IOException if remove chatroom member fails
      */
     public void deleteChatRoomMember(String chatRoomUserName, String userName) throws IOException {
-        DeleteChatRoomMemberResponse response = wechatHttpServiceInternal.deleteChatRoomMember(cacheService.getHostUrl(), cacheService.getBaseRequest(), chatRoomUserName, userName);
+        DeleteChatRoomMemberResponse response = wechatHttpServiceInternal.deleteChatRoomMember(chatRoomUserName, userName);
         WechatUtils.checkBaseResponse(response);
     }
 
@@ -133,7 +158,7 @@ public class WechatHttpService {
      * @throws IOException if add chatroom member fails
      */
     public void addChatRoomMember(String chatRoomUserName, String userName) throws IOException {
-        AddChatRoomMemberResponse response = wechatHttpServiceInternal.addChatRoomMember(cacheService.getHostUrl(), cacheService.getBaseRequest(), chatRoomUserName, userName);
+        AddChatRoomMemberResponse response = wechatHttpServiceInternal.addChatRoomMember(chatRoomUserName, userName);
         WechatUtils.checkBaseResponse(response);
         Contact chatRoom = cacheService.getChatRooms().stream().filter(x -> chatRoomUserName.equals(x.getUserName())).findFirst().orElse(null);
         if (chatRoom == null) {
@@ -148,8 +173,8 @@ public class WechatHttpService {
      * @param url image url
      * @return image data
      */
-    public byte[] downloadImage(String url) {
-        return wechatHttpServiceInternal.downloadImage(url);
+    public void download(String url, String fileName, MessageType type) {
+        wechatHttpServiceInternal.download(url, fileName, type);
     }
 
     /**
@@ -158,14 +183,14 @@ public class WechatHttpService {
      * @param userName the contact with whom I need to set the messages read.
      * @throws IOException if statusNotify fails.
      */
-    private void notifyNecessary(String userName) throws IOException {
-        if (userName == null) {
+    private void notifyNecessary(String toUserName) throws IOException {
+        if (toUserName == null) {
             throw new IllegalArgumentException("userName");
         }
         Set<String> unreadContacts = cacheService.getContactNamesWithUnreadMessage();
-        if (unreadContacts.contains(userName)) {
-            wechatHttpServiceInternal.statusNotify(cacheService.getHostUrl(), cacheService.getBaseRequest(), userName, StatusNotifyCode.READED.getCode());
-            unreadContacts.remove(userName);
+        if (unreadContacts.contains(toUserName)) {
+            wechatHttpServiceInternal.statusNotify(toUserName, StatusNotifyCode.READED.getCode());
+            unreadContacts.remove(toUserName);
         }
     }
 }

@@ -1,0 +1,311 @@
+2019-01-21 01:26:17.276 INFO  org.springframework.boot.StartupInfoLogger.logStarting(StartupInfoLogger.java:50) - Starting JeevesApplication on DESKTOP-PT5LGDT with PID 68576 (C:\Users\Crap\git\jeeves\target\classes started by Crap in C:\Users\Crap\git\jeeves)
+2019-01-21 01:26:17.279 INFO  org.springframework.boot.SpringApplication.logStartupProfileInfo(SpringApplication.java:675) - No active profile set, falling back to default profiles: default
+2019-01-21 01:26:19.078 INFO  org.springframework.boot.StartupInfoLogger.logStarted(StartupInfoLogger.java:59) - Started JeevesApplication in 2.214 seconds (JVM running for 3.121)
+2019-01-21 01:26:19.088 WARN  com.cherry.jeeves.service.CleanupService.destroy(CleanupService.java:21) - [*] system is being destroyed
+2019-01-21 01:30:23.670 WARN  org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:554) - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'jeeves': Unsatisfied dependency expressed through field 'loginService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'loginService': Unsatisfied dependency expressed through field 'AUTO_RELOGIN_WHEN_QRCODE_EXPIRED'; nested exception is org.springframework.beans.TypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'boolean'; nested exception is java.lang.IllegalArgumentException: Invalid boolean value [${jeeves.auto-relogin-when-qrcode-expired}]
+2019-01-21 01:34:45.333 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:34:45.333 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:34:45.780 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:34:45.985 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:34:46.179 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:34:46.292 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:36:16.919 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:36:16.920 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:36:17.326 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:36:17.510 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:36:17.721 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:36:17.820 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:46:36.140 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:46:36.141 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:46:36.580 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:46:36.788 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:46:36.957 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:46:37.065 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:49:14.867 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:49:14.868 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:49:15.302 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:49:15.492 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:49:15.650 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:49:15.751 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:51:18.063 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:51:18.064 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:51:18.523 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:51:18.708 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:51:18.850 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:51:18.948 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:56:06.563 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:56:06.564 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:56:06.978 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:56:07.202 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:56:07.382 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:56:07.497 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:57:12.043 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:57:12.044 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:57:12.444 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:57:12.626 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:57:12.770 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:57:12.870 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:57:38.318 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:57:38.320 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:57:38.700 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:57:38.908 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:57:39.058 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:57:39.152 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:59:33.667 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:22) - Jeeves starts
+2019-01-21 01:59:33.669 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves id = jeeves
+2019-01-21 01:59:34.084 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 01:59:34.281 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 01:59:34.448 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:69) - [2] qrcode completed
+2019-01-21 01:59:34.558 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:72) - [3] statReport completed
+2019-01-21 01:59:59.626 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:96) - [*] login status = AWAIT_SCANNING
+2019-01-21 02:00:17.926 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:94) - [*] login status = AWAIT_CONFIRMATION
+2019-01-21 02:00:20.602 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:104) - [4] login completed
+2019-01-21 02:00:21.259 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:120) - [5] redirect login completed
+2019-01-21 02:00:21.300 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:123) - [6] redirect completed
+2019-01-21 02:00:21.788 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:129) - [7] init completed
+2019-01-21 02:00:21.925 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:135) - [8] status notify completed
+2019-01-21 02:00:22.377 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:141) - [*] getContactResponse seq = 0
+2019-01-21 02:00:22.378 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:142) - [*] getContactResponse memberCount = 12
+2019-01-21 02:00:22.379 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:147) - [9] get contact completed
+2019-01-21 02:00:22.540 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:160) - [*] batchGetContactResponse count = 1
+2019-01-21 02:00:22.540 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:163) - [10] batch get contact completed
+2019-01-21 02:00:22.540 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:165) - [*] login process completed
+2019-01-21 02:00:22.540 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:166) - [*] start listening
+2019-01-21 02:00:22.540 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogin(MessageHandlerImpl.java:37) - 用户登录
+2019-01-21 02:00:22.540 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogin(MessageHandlerImpl.java:38) - 用ID：@d8cf22ef65179ef45514cdbbd7b80fab
+2019-01-21 02:00:22.541 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogin(MessageHandlerImpl.java:39) - 用户名：Crap
+2019-01-21 02:00:22.696 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:31.891 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:32.023 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:108) - 私聊文本消息
+2019-01-21 02:00:32.024 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:109) - from: @e95b1ab4997bf21be72bb1922492e87c
+2019-01-21 02:00:32.024 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:110) - to: @d8cf22ef65179ef45514cdbbd7b80fab
+2019-01-21 02:00:32.024 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:111) - content:asdf 
+2019-01-21 02:00:32.193 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:32.444 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:45.631 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:45.746 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:108) - 私聊文本消息
+2019-01-21 02:00:45.746 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:109) - from: @e95b1ab4997bf21be72bb1922492e87c
+2019-01-21 02:00:45.746 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:110) - to: @d8cf22ef65179ef45514cdbbd7b80fab
+2019-01-21 02:00:45.747 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:111) - content:werwer
+2019-01-21 02:00:45.925 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:46.194 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:50.760 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:50.890 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:00:50.890 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=8314816579574508757&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:00:51.047 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:51.304 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:53.929 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:54.055 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:00:54.055 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=5627760263793133558&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:00:54.230 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:54.463 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:57.390 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:57.538 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:00:57.539 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=2491291669596336811&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:00:57.685 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:00:57.947 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:01:23.101 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:01:48.137 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:01:48.169 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:01:48.325 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:108) - 私聊文本消息
+2019-01-21 02:01:48.326 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:109) - from: @d8cf22ef65179ef45514cdbbd7b80fab
+2019-01-21 02:01:48.326 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:110) - to: @@006c443bb8f48a1f8f0cbddbe1e07451e27215e0fcf6e9b978812563373cac4a
+2019-01-21 02:01:48.326 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:111) - content:@韩寒 asdf
+2019-01-21 02:01:48.326 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingFriendInvitation(MessageHandlerImpl.java:201) - onReceivingFriendInvitation
+2019-01-21 02:01:48.326 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingFriendInvitation(MessageHandlerImpl.java:202) - recommendinfo content:我是韩寒
+2019-01-21 02:01:49.202 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 6
+2019-01-21 02:01:49.291 INFO  com.cherry.jeeves.service.SyncServie.lambda$0(SyncServie.java:238) - [*] you've accepted the invitation
+2019-01-21 02:01:49.291 INFO  com.cherry.jeeves.MessageHandlerImpl.postAcceptFriendInvitation(MessageHandlerImpl.java:209) - postAcceptFriendInvitation
+2019-01-21 02:01:49.466 INFO  com.cherry.jeeves.MessageHandlerImpl.onNewFriendsFound(MessageHandlerImpl.java:245) - onNewFriendsFound
+2019-01-21 02:01:49.466 INFO  com.cherry.jeeves.MessageHandlerImpl.lambda$4(MessageHandlerImpl.java:247) - @a4280bd959d46bc24c060039ea8b8e31
+2019-01-21 02:01:49.467 INFO  com.cherry.jeeves.MessageHandlerImpl.lambda$4(MessageHandlerImpl.java:248) - 韩寒
+2019-01-21 02:01:49.803 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 4
+2019-01-21 02:01:59.319 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:01:59.473 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:01:59.473 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=4085639244648075364&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:01:59.618 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:01:59.862 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:02.818 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:02.954 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:02:02.954 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=8410096754112557259&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:02:03.131 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:03.381 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:07.338 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:07.477 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:02:07.477 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=4105267118197284924&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:02:07.627 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:07.876 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:25.432 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:25.569 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:02:25.569 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=1884385099591277306&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:02:25.730 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:25.989 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:26.753 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:26.878 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:02:26.878 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=3744653029845983301&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:02:27.027 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:27.302 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:02:52.441 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:03:17.472 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:03:42.508 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:04:07.550 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:04:32.595 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:04:57.622 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:05:22.666 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:05:47.697 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:06:12.728 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:06:37.764 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:06:37.802 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:06:38.001 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateVideoMessage(MessageHandlerImpl.java:171) - 私聊视频消息
+2019-01-21 02:06:38.001 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateVideoMessage(MessageHandlerImpl.java:172) - videoUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetvideo?msgid=3570774973614407488&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778
+2019-01-21 02:06:38.152 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:06:38.421 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:06:59.316 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:06:59.482 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateImageMessage(MessageHandlerImpl.java:125) - 私聊图片消息
+2019-01-21 02:06:59.482 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateImageMessage(MessageHandlerImpl.java:126) - thumbImageUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=6006442182264862839&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=slave
+2019-01-21 02:06:59.482 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateImageMessage(MessageHandlerImpl.java:127) - fullImageUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=6006442182264862839&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778
+2019-01-21 02:06:59.658 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:06:59.934 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:14.469 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:14.602 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:07:14.602 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=1713091734355439186&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:07:14.767 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:15.013 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:29.204 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:29.348 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:07:29.349 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=521227758557373916&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:07:29.501 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:29.792 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:34.577 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:34.695 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:108) - 私聊文本消息
+2019-01-21 02:07:34.696 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:109) - from: @a4280bd959d46bc24c060039ea8b8e31
+2019-01-21 02:07:34.696 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:110) - to: @d8cf22ef65179ef45514cdbbd7b80fab
+2019-01-21 02:07:34.696 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateTextMessage(MessageHandlerImpl.java:111) - content:国家经济
+2019-01-21 02:07:34.866 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:07:35.087 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:08:00.243 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:08:25.291 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:08:50.323 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:09:15.363 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:09:40.403 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:10:05.427 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:10:30.470 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:10:55.510 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:11:20.550 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:11:45.590 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:12:10.635 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:12:35.674 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:13:00.721 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:13:25.758 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:13:50.797 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:14:15.826 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:14:40.863 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:15:05.964 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:15:31.050 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:15:35.085 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:16:00.345 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:16:25.390 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:16:50.431 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:17:15.460 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:17:40.503 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:18:05.575 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:18:25.658 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:18:45.857 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:18:46.019 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:18:46.020 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=5355970652707757130&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:19:11.046 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:19:11.086 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:19:11.233 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:141) - 私聊表情消息
+2019-01-21 02:19:11.234 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingPrivateEmoticonMessage(MessageHandlerImpl.java:142) - emoticonUrl:https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=4762981290770363382&skey=@crypt_1bdac1b9_3535bc61d2b0fe95f7f193229129e778&type=big
+2019-01-21 02:19:36.264 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:20:01.306 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:20:26.332 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:20:51.379 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:21:16.418 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:21:41.453 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:22:06.494 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:22:31.538 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:22:49.284 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:23:14.511 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:23:39.558 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:24:04.604 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:24:29.651 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:24:39.961 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:25:05.180 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:25:18.437 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 4
+2019-01-21 02:25:18.674 INFO  com.cherry.jeeves.MessageHandlerImpl.onFriendsDeleted(MessageHandlerImpl.java:254) - onFriendsDeleted
+2019-01-21 02:25:18.676 INFO  com.cherry.jeeves.MessageHandlerImpl.lambda$5(MessageHandlerImpl.java:256) - @a4280bd959d46bc24c060039ea8b8e31
+2019-01-21 02:25:18.676 INFO  com.cherry.jeeves.MessageHandlerImpl.lambda$5(MessageHandlerImpl.java:257) - null
+2019-01-21 02:25:43.713 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:26:06.494 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:26:31.669 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:26:56.700 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:27:21.753 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:27:24.133 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 02:27:24.358 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingFriendInvitation(MessageHandlerImpl.java:201) - onReceivingFriendInvitation
+2019-01-21 02:27:24.358 INFO  com.cherry.jeeves.MessageHandlerImpl.onReceivingFriendInvitation(MessageHandlerImpl.java:202) - recommendinfo content:我是烧饼
+2019-01-21 02:27:25.312 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 6
+2019-01-21 02:27:25.409 INFO  com.cherry.jeeves.service.SyncServie.lambda$0(SyncServie.java:238) - [*] you've accepted the invitation
+2019-01-21 02:27:25.409 INFO  com.cherry.jeeves.MessageHandlerImpl.postAcceptFriendInvitation(MessageHandlerImpl.java:209) - postAcceptFriendInvitation
+2019-01-21 02:27:25.598 INFO  com.cherry.jeeves.MessageHandlerImpl.onNewFriendsFound(MessageHandlerImpl.java:245) - onNewFriendsFound
+2019-01-21 02:27:25.598 INFO  com.cherry.jeeves.MessageHandlerImpl.lambda$4(MessageHandlerImpl.java:247) - @a4280bd959d46bc24c060039ea8b8e31
+2019-01-21 02:27:25.599 INFO  com.cherry.jeeves.MessageHandlerImpl.lambda$4(MessageHandlerImpl.java:248) - 韩寒
+2019-01-21 02:27:25.914 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 4
+2019-01-21 02:27:51.181 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:28:16.211 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:28:41.251 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:29:06.291 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:29:31.326 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:29:56.368 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:30:21.393 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 0
+2019-01-21 02:30:34.729 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 1101, selector = 0
+2019-01-21 02:30:34.730 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogout(MessageHandlerImpl.java:44) - 用户退出
+2019-01-21 02:30:34.730 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogout(MessageHandlerImpl.java:45) - 用ID：@d8cf22ef65179ef45514cdbbd7b80fab
+2019-01-21 02:30:34.730 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogout(MessageHandlerImpl.java:46) - 用户名：Crap
+2019-01-21 04:44:28.414 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves starts
+2019-01-21 04:44:28.415 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:24) - Jeeves id = jeeves
+2019-01-21 04:44:28.799 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 04:44:29.004 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 04:44:29.175 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:65) - [2] qrcode completed
+2019-01-21 04:44:29.270 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:68) - [3] statReport completed
+2019-01-21 04:44:54.338 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:95) - [*] login status = AWAIT_SCANNING
+2019-01-21 04:44:54.338 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:33) - 用户已扫码
+2019-01-21 04:44:54.338 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:34) - 头像：null
+2019-01-21 04:45:19.398 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:95) - [*] login status = AWAIT_SCANNING
+2019-01-21 04:45:19.399 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:33) - 用户已扫码
+2019-01-21 04:45:19.399 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:34) - 头像：null
+2019-01-21 04:48:43.779 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:23) - Jeeves starts
+2019-01-21 04:48:43.780 INFO  com.cherry.jeeves.Jeeves.start(Jeeves.java:24) - Jeeves id = jeeves
+2019-01-21 04:48:44.167 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:52) - [0] entry completed
+2019-01-21 04:48:44.372 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:56) - [1] uuid completed
+2019-01-21 04:48:44.521 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:65) - [2] qrcode completed
+2019-01-21 04:48:44.615 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:68) - [3] statReport completed
+2019-01-21 04:48:54.566 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:93) - [*] login status = AWAIT_CONFIRMATION
+2019-01-21 04:48:54.566 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:33) - 用户已扫码
+2019-01-21 04:48:54.567 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:34) - 头像：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
+2019-01-21 04:49:14.086 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:93) - [*] login status = AWAIT_CONFIRMATION
+2019-01-21 04:49:14.086 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:33) - 用户已扫码
+2019-01-21 04:49:14.086 INFO  com.cherry.jeeves.MessageHandlerImpl.onScanning(MessageHandlerImpl.java:34) - 头像：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
+2019-01-21 04:49:19.015 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:105) - [4] login completed
+2019-01-21 04:49:19.015 INFO  com.cherry.jeeves.MessageHandlerImpl.onConfirmation(MessageHandlerImpl.java:44) - 确认登录
+2019-01-21 04:49:19.394 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:122) - [5] redirect login completed
+2019-01-21 04:49:19.482 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:125) - [6] redirect completed
+2019-01-21 04:49:20.025 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:131) - [7] init completed
+2019-01-21 04:49:20.102 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:137) - [8] status notify completed
+2019-01-21 04:49:21.817 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:143) - [*] getContactResponse seq = 0
+2019-01-21 04:49:21.817 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:144) - [*] getContactResponse memberCount = 303
+2019-01-21 04:49:21.819 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:149) - [9] get contact completed
+2019-01-21 04:49:22.342 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:162) - [*] batchGetContactResponse count = 4
+2019-01-21 04:49:22.342 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:165) - [10] batch get contact completed
+2019-01-21 04:49:22.342 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:167) - [*] login process completed
+2019-01-21 04:49:22.342 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:168) - [*] start listening
+2019-01-21 04:49:22.343 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogin(MessageHandlerImpl.java:48) - 用户登录
+2019-01-21 04:49:22.343 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogin(MessageHandlerImpl.java:49) - 用ID：@0cc734163e4a21b1954e77728eac83ed
+2019-01-21 04:49:22.343 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogin(MessageHandlerImpl.java:50) - 用户名：韩寒
+2019-01-21 04:49:22.512 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 0, selector = 2
+2019-01-21 04:49:30.659 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:69) - [SYNCCHECK] retcode = 1101, selector = 0
+2019-01-21 04:49:30.659 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogout(MessageHandlerImpl.java:55) - 用户退出
+2019-01-21 04:49:30.659 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogout(MessageHandlerImpl.java:56) - 用ID：@0cc734163e4a21b1954e77728eac83ed
+2019-01-21 04:49:30.660 INFO  com.cherry.jeeves.MessageHandlerImpl.onLogout(MessageHandlerImpl.java:57) - 用户名：韩寒
+2019-01-21 04:49:30.660 INFO  com.cherry.jeeves.service.SyncServie.listen(SyncServie.java:82) - [LOGINOUT] syncCheckResponse ret =  1101
+2019-01-21 04:49:30.660 INFO  com.cherry.jeeves.service.LoginService.login(LoginService.java:177) - [*] exit bye

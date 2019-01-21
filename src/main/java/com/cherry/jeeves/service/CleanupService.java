@@ -22,7 +22,7 @@ public class CleanupService implements DisposableBean {
         if (cacheService.isAlive()) {
             try {
                 logger.warn("[*] logging out");
-                wechatHttpService.logout(cacheService.getHostUrl(), cacheService.getsKey());
+                wechatHttpService.logout();
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
             }

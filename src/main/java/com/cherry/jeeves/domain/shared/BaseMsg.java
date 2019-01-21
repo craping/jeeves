@@ -1,12 +1,19 @@
 package com.cherry.jeeves.domain.shared;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
 public class BaseMsg {
     @JsonProperty
     private int Type;
+    @JsonProperty
+    private Integer EmojiFlag;
+    @JsonProperty
+    private String EMoticonMd5;
     @JsonProperty
     private String Content;
     @JsonProperty
@@ -17,6 +24,8 @@ public class BaseMsg {
     private String LocalID;
     @JsonProperty
     private String ClientMsgId;
+    @JsonProperty
+    private String MediaId;
 
     public int getType() {
         return Type;
@@ -65,4 +74,29 @@ public class BaseMsg {
     public void setClientMsgId(String clientMsgId) {
         ClientMsgId = clientMsgId;
     }
+
+	public String getMediaId() {
+		return MediaId;
+	}
+
+	public void setMediaId(String mediaId) {
+		MediaId = mediaId;
+	}
+
+	public Integer getEmojiFlag() {
+		return EmojiFlag;
+	}
+
+	public void setEmojiFlag(Integer emojiFlag) {
+		EmojiFlag = emojiFlag;
+	}
+
+	public String getEMoticonMd5() {
+		return EMoticonMd5;
+	}
+
+	public void setEMoticonMd5(String eMoticonMd5) {
+		EMoticonMd5 = eMoticonMd5;
+	}
+    
 }

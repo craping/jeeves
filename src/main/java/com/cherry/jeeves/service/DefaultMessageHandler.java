@@ -2,6 +2,7 @@ package com.cherry.jeeves.service;
 
 import com.cherry.jeeves.domain.shared.ChatRoomMember;
 import com.cherry.jeeves.domain.shared.Contact;
+import com.cherry.jeeves.domain.shared.Member;
 import com.cherry.jeeves.domain.shared.Message;
 import com.cherry.jeeves.domain.shared.RecommendInfo;
 import org.slf4j.Logger;
@@ -25,12 +26,12 @@ public class DefaultMessageHandler implements MessageHandler {
     }
 
     @Override
-    public void onReceivingPrivateTextMessage(Message message) throws IOException {
+    public void onReceivingPrivateTextMessage(Message message) {
         logger.info("onReceivingPrivateTextMessage");
     }
 
     @Override
-    public void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl) throws IOException {
+    public void onReceivingPrivateImageMessage(Message message, String thumbImageUrl, String fullImageUrl) {
         logger.info("onReceivingPrivateImageMessage");
     }
 
@@ -84,4 +85,88 @@ public class DefaultMessageHandler implements MessageHandler {
     public void onRedPacketReceived(Contact contact) {
         logger.info("onRedPacketReceived");
     }
+
+	@Override
+	public void onReceivingChatRoomEmoticonMessage(Message message, String emoticonUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingChatRoomVoiceMessage(Message message, String voiceUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingChatRoomVideoMessage(Message message, String thumbImageUrl, String videoUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingChatRoomMediaMessage(Message message, String mediaUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingPrivateEmoticonMessage(Message message, String emoticonUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingPrivateVoiceMessage(Message message, String voiceUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingPrivateVideoMessage(Message message, String thumbImageUrl, String videoUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReceivingPrivateMediaMessage(Message message, String mediaUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLogin(Member member) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLogout(Member member) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onScanning(String headImgBase64) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onExpired() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onConfirmation() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onQR(byte[] qrData) {
+		// TODO Auto-generated method stub
+		
+	}
 }
