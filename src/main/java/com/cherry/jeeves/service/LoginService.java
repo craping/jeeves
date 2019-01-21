@@ -177,14 +177,10 @@ public class LoginService {
 			logger.info("[*] exit bye");
 		} catch (IOException | URISyntaxException ex) {
 			ex.printStackTrace();
-			throw new WechatException(ex);
+			logger.info("[*] exit bye");
 		} catch (WechatQRExpiredException ex) {
-			if (AUTO_RELOGIN_WHEN_QRCODE_EXPIRED && qrRefreshTimes <= MAX_QR_REFRESH_TIMES) {
-				login();
-			} else {
-				syncServie.getMessageHandler().onExpired();
-				logger.info("[*] exit bye");
-			}
+			syncServie.getMessageHandler().onExpired();
+			logger.info("[*] exit bye");
 		}
     }
     

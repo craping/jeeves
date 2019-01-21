@@ -12,9 +12,9 @@ import java.util.Set;
 public interface MessageHandler {
 	
 	/**
-     * 事件：获取二维码消息
+     * 事件：获取登录二维码消息
      *
-     * @param qrData 二维码数据
+     * @param qrData 登录二维码数据
      */
 	void onQR(byte[] qrData);
 	/**
