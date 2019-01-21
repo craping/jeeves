@@ -71,6 +71,7 @@ public class LoginService {
 			LoginResult loginResponse;
 			while (true) {
 				if(Thread.currentThread().isInterrupted()) {
+					logger.info("[Stop] exit bye");
 					return;
 				}
 				loginResponse = wechatHttpServiceInternal.login(uuid);
@@ -149,13 +150,13 @@ public class LoginService {
 			logger.info("[9] get contact completed");
 			//10 batch get contact
 			ChatRoomDescription[] chatRoomDescriptions = initResponse.getContactList().stream()
-					.filter(x -> x != null && WechatUtils.isChatRoom(x))
-					.map(x -> {
-						ChatRoomDescription description = new ChatRoomDescription();
-						description.setUserName(x.getUserName());
-						return description;
-					})
-					.toArray(ChatRoomDescription[]::new);
+				.filter(x -> x != null && WechatUtils.isChatRoom(x))
+				.map(x -> {
+					ChatRoomDescription description = new ChatRoomDescription();
+					description.setUserName(x.getUserName());
+					return description;
+				})
+				.toArray(ChatRoomDescription[]::new);
 			if (chatRoomDescriptions.length > 0) {
 				BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(chatRoomDescriptions);
 				WechatUtils.checkBaseResponse(batchGetContactResponse);
@@ -170,6 +171,7 @@ public class LoginService {
 			syncServie.getMessageHandler().onLogin(initResponse.getUser());
 			while (cacheService.isAlive()) {
 				if(Thread.currentThread().isInterrupted()) {
+					logger.info("[Logout] exit bye");
 					return;
 				}
 				syncServie.listen();
@@ -177,10 +179,10 @@ public class LoginService {
 			logger.info("[*] exit bye");
 		} catch (IOException | URISyntaxException ex) {
 			ex.printStackTrace();
-			logger.info("[*] exit bye");
+			logger.info("[Exception] exit bye");
 		} catch (WechatQRExpiredException ex) {
 			syncServie.getMessageHandler().onExpired();
-			logger.info("[*] exit bye");
+			logger.info("[Expired] exit bye");
 		}
     }
     

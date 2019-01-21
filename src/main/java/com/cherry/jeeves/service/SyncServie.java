@@ -79,7 +79,7 @@ public class SyncServie {
         } else if(retCode == RetCode.LOGOUT1.getCode() || retCode == RetCode.LOGOUT2.getCode() || retCode == RetCode.LOGOUT3.getCode()) {
         	this.messageHandler.onLogout(cacheService.getOwner());
         	cacheService.setAlive(false);
-        	 logger.info(String.format("[LOGINOUT] syncCheckResponse ret =  %s", retCode));
+        	 logger.info(String.format("[Logout] syncCheckResponse ret =  %s", retCode));
 //        	throw new WechatException("syncCheckResponse ret = " + retCode);
         }
     }
