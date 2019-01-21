@@ -1,8 +1,6 @@
 package com.cherry.jeeves.service;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.stream.Collectors;
 
@@ -57,12 +55,6 @@ public class LoginService {
 			//2 qr
 			byte[] qrData = wechatHttpServiceInternal.getQR(uuid);
 			syncServie.getMessageHandler().onQR(qrData);
-			OutputStream out = new FileOutputStream("QR.jpg");
-			out.write(qrData);
-			out.flush();
-			out.close();
-			Runtime runtime = Runtime.getRuntime();
-			runtime.exec("cmd /c start QR.jpg");
 			logger.info("[2] qrcode completed");
 			//3 statreport
 			wechatHttpServiceInternal.statReport();
