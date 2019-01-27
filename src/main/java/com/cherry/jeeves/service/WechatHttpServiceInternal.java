@@ -458,7 +458,7 @@ class WechatHttpServiceInternal {
      * @return chatroom members information
      * @throws IOException if the http response body can't be convert to {@link BatchGetContactResponse}
      */
-    BatchGetContactResponse batchGetContact(ChatRoomDescription[] list) throws IOException {
+    BatchGetContactResponse batchGetContact(ChatRoomDescription[] list) {
         long rnd = System.currentTimeMillis();
         String url = String.format(WECHAT_URL_BATCH_GET_CONTACT, cacheService.getHostUrl(), rnd, cacheService.getPassTicket());
         BatchGetContactRequest request = new BatchGetContactRequest();
@@ -469,7 +469,12 @@ class WechatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), BatchGetContactResponse.class);
+        try {
+			return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), BatchGetContactResponse.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
     }
 
     /**

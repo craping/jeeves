@@ -10,7 +10,7 @@ public class Contact extends Member {
     @JsonProperty
     private int MemberCount;
     @JsonProperty
-    private Set<ChatRoomMember> MemberList;
+    private Set<Contact> MemberList;
     @JsonProperty
     private int OwnerUin;
     @JsonProperty
@@ -132,11 +132,11 @@ public class Contact extends Member {
         MemberCount = memberCount;
     }
 
-    public Set<ChatRoomMember> getMemberList() {
+    public Set<Contact> getMemberList() {
         return MemberList;
     }
 
-    public void setMemberList(Set<ChatRoomMember> memberList) {
+    public void setMemberList(Set<Contact> memberList) {
         MemberList = memberList;
     }
 

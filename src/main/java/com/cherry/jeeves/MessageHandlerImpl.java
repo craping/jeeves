@@ -1,6 +1,8 @@
 package com.cherry.jeeves;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -8,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.cherry.jeeves.domain.shared.ChatRoomMember;
 import com.cherry.jeeves.domain.shared.Contact;
 import com.cherry.jeeves.domain.shared.Member;
 import com.cherry.jeeves.domain.shared.Message;
@@ -30,6 +31,16 @@ public class MessageHandlerImpl implements MessageHandler {
 	@Override
 	public void onQR(byte[] qrData) {
 		logger.info("获取登录二维码");
+		try {
+			OutputStream out = new FileOutputStream("QR.jpg");
+			out.write(qrData);
+			out.flush();
+			out.close();
+			Runtime runtime = Runtime.getRuntime();
+			runtime.exec("cmd /c start QR.jpg");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -230,16 +241,16 @@ public class MessageHandlerImpl implements MessageHandler {
 	}
 
 	@Override
-	public void onChatRoomMembersChanged(Contact chatRoom, Set<ChatRoomMember> membersJoined, Set<ChatRoomMember> membersLeft) {
+	public void onChatRoomMembersChanged(Contact chatRoom, Set<Contact> membersJoined, Set<Contact> membersLeft) {
 		logger.info("群成员变动消息");
 		logger.info("群ID:" + chatRoom.getUserName());
 		if (membersJoined != null && membersJoined.size() > 0) {
 			logger.info("新加入成员:" + String.join(",",
-					membersJoined.stream().map(ChatRoomMember::getNickName).collect(Collectors.toList())));
+					membersJoined.stream().map(Contact::getNickName).collect(Collectors.toList())));
 		}
 		if (membersLeft != null && membersLeft.size() > 0) {
 			logger.info("离开成员:" + String.join(",",
-					membersLeft.stream().map(ChatRoomMember::getNickName).collect(Collectors.toList())));
+					membersLeft.stream().map(Contact::getNickName).collect(Collectors.toList())));
 		}
 	}
 
@@ -289,5 +300,35 @@ public class MessageHandlerImpl implements MessageHandler {
 		if (contact != null) {
 			logger.info("红包来自： " + contact.getNickName());
 		}
+	}
+
+	@Override
+	public void onStatusNotifyReaded(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyEnterSession(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyInited(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyQuitSession(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifySyncConv(Message message) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -106,16 +106,41 @@ public class WechatHttpService {
      * @return chatroom list
      * @throws IOException if batchGetContact fails
      */
-    public Set<Contact> batchGetContact(Set<String> list) throws IOException {
-        ChatRoomDescription[] descriptions =
-                list.stream().map(x -> {
-                    ChatRoomDescription description = new ChatRoomDescription();
-                    description.setUserName(x);
-                    return description;
-                }).toArray(ChatRoomDescription[]::new);
-        BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
-        WechatUtils.checkBaseResponse(response);
-        return response.getContactList();
+    public Contact getChatRoomInfo(String chatRoomId) throws IOException {
+    	Contact chatRoom = null;
+    	for (Contact c : cacheService.getChatRooms()) {
+			if(c.getUserName().equals(chatRoomId)){
+				chatRoom = c;
+				break;
+			}
+		}
+    	if(chatRoom == null)
+    		return null;
+    	
+		long loop = 0;
+		while (true) {
+			ChatRoomDescription[] descriptions = chatRoom.getMemberList().stream()
+				.skip(loop * 50)
+				.limit(50)
+				.map(x -> {
+					ChatRoomDescription description = new ChatRoomDescription();
+					description.setEncryChatRoomId(x.getEncryChatRoomId());
+					description.setUserName(x.getUserName());
+					return description;
+				}).toArray(ChatRoomDescription[]::new);
+			if (descriptions.length > 0) {
+				BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
+				WechatUtils.checkBaseResponse(response);
+				for (Contact c : response.getContactList()) {
+					chatRoom.getMemberList().remove(c);
+					chatRoom.getMemberList().add(c);
+				}
+			} else {
+				break;
+			}
+			loop++;
+		}
+        return chatRoom;
     }
 
     /**

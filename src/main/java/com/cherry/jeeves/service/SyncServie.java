@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -17,17 +18,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.cherry.jeeves.domain.response.BatchGetContactResponse;
 import com.cherry.jeeves.domain.response.SyncCheckResponse;
 import com.cherry.jeeves.domain.response.SyncResponse;
 import com.cherry.jeeves.domain.response.VerifyUserResponse;
-import com.cherry.jeeves.domain.shared.ChatRoomMember;
+import com.cherry.jeeves.domain.shared.ChatRoomDescription;
 import com.cherry.jeeves.domain.shared.Contact;
 import com.cherry.jeeves.domain.shared.Message;
 import com.cherry.jeeves.domain.shared.RecommendInfo;
 import com.cherry.jeeves.domain.shared.VerifyUser;
+import com.cherry.jeeves.enums.AppMessageType;
 import com.cherry.jeeves.enums.MessageType;
 import com.cherry.jeeves.enums.RetCode;
 import com.cherry.jeeves.enums.Selector;
+import com.cherry.jeeves.enums.StatusNotifyCode;
 import com.cherry.jeeves.utils.WechatUtils;
 
 @Component
@@ -214,7 +218,8 @@ public class SyncServie {
 	        		//系统消息
 	        		else if (message.getMsgType() == MessageType.SYS.getCode()) {
 	        			//红包
-	        			if (RED_PACKET_CONTENT.equals(message.getContent())) {
+	        			
+	        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
 	        				logger.info("[*] you've received a red packet");
 	        				String from = message.getFromUserName();
 	        				Set<Contact> contacts = null;
@@ -242,6 +247,61 @@ public class SyncServie {
 	        				logger.info("[*] you've declined the invitation");
 	        				//TODO decline invitation
 	        			}
+	        		}
+	        		//状态同步消息
+	        		else if (message.getMsgType() == MessageType.STATUSNOTIFY.getCode()) {
+						// 消息已读
+						if (message.getStatusNotifyCode() == StatusNotifyCode.READED.getCode()) {
+							messageHandler.onStatusNotifyReaded(message);
+						} 
+						// 发起会话
+						else if (message.getStatusNotifyCode() == StatusNotifyCode.ENTER_SESSION.getCode()) {
+							messageHandler.onStatusNotifyEnterSession(message);
+						} 
+						//正在输入
+						else if (message.getStatusNotifyCode() == StatusNotifyCode.INITED.getCode()) {
+							messageHandler.onStatusNotifyInited(message);
+						}
+						// 同步通讯录
+						else if (message.getStatusNotifyCode() == StatusNotifyCode.SYNC_CONV.getCode()) {
+							Set<Contact> chatRooms = Arrays.stream(message.getStatusNotifyUserName().split(","))
+									.filter(x -> x != null && x.startsWith("@@")).map(x -> {
+										Contact contact = new Contact();
+										contact.setUserName(x);
+										return contact;
+									}).collect(Collectors.toSet());
+							
+							long loop = 0;
+							while (true) {
+								ChatRoomDescription[] chatRoomDescriptions = chatRooms.stream()
+									.skip(loop * 50)
+									.limit(50)
+									.map(x -> {
+										ChatRoomDescription description = new ChatRoomDescription();
+										description.setUserName(x.getUserName());
+										return description;
+									}).toArray(ChatRoomDescription[]::new);
+								if (chatRoomDescriptions.length > 0) {
+									BatchGetContactResponse batchGetContactResponse = wechatHttpService
+											.batchGetContact(chatRoomDescriptions);
+									WechatUtils.checkBaseResponse(batchGetContactResponse);
+									logger.info("[*] batchGetContactResponse count = "
+											+ batchGetContactResponse.getCount());
+									batchGetContactResponse.getContactList().forEach(x -> {
+										cacheService.getChatRooms().remove(x);
+										cacheService.getChatRooms().add(x);
+									});
+								} else {
+									break;
+								}
+								loop++;
+							}
+							messageHandler.onStatusNotifySyncConv(message);
+						} 
+						//关闭会话
+						else if (message.getStatusNotifyCode() == StatusNotifyCode.QUIT_SESSION.getCode()) {
+							messageHandler.onStatusNotifyQuitSession(message);
+						}
 	        		}
         		} catch (Exception e) {
         			logger.error("handler exception", e);
@@ -302,10 +362,10 @@ public class SyncServie {
                 existingChatRooms.remove(existingChatRoom);
                 existingChatRooms.add(chatRoom);
                 if (messageHandler != null) {
-                    Set<ChatRoomMember> oldMembers = existingChatRoom.getMemberList();
-                    Set<ChatRoomMember> newMembers = chatRoom.getMemberList();
-                    Set<ChatRoomMember> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
-                    Set<ChatRoomMember> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
+                    Set<Contact> oldMembers = existingChatRoom.getMemberList();
+                    Set<Contact> newMembers = chatRoom.getMemberList();
+                    Set<Contact> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
+                    Set<Contact> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
                     if (joined.size() > 0 || left.size() > 0) {
                         messageHandler.onChatRoomMembersChanged(chatRoom, joined, left);
                     }

@@ -8,7 +8,7 @@ public class ChatRoomDescription {
     @JsonProperty
     private String UserName;
     @JsonProperty
-    private String ChatRoomId = "";
+    private String EncryChatRoomId = "";
 
     public String getUserName() {
         return UserName;
@@ -18,11 +18,13 @@ public class ChatRoomDescription {
         UserName = userName;
     }
 
-    public String getChatRoomId() {
-        return ChatRoomId;
-    }
+	public String getEncryChatRoomId() {
+		return EncryChatRoomId;
+	}
 
-    public void setChatRoomId(String chatRoomId) {
-        ChatRoomId = chatRoomId;
-    }
+	public void setEncryChatRoomId(String encryChatRoomId) {
+		EncryChatRoomId = encryChatRoomId;
+	}
+    
+    
 }

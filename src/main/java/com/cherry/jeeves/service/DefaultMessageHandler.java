@@ -1,15 +1,15 @@
 package com.cherry.jeeves.service;
 
-import com.cherry.jeeves.domain.shared.ChatRoomMember;
+import java.io.IOException;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.cherry.jeeves.domain.shared.Contact;
 import com.cherry.jeeves.domain.shared.Member;
 import com.cherry.jeeves.domain.shared.Message;
 import com.cherry.jeeves.domain.shared.RecommendInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Set;
 
 public class DefaultMessageHandler implements MessageHandler {
 
@@ -47,7 +47,7 @@ public class DefaultMessageHandler implements MessageHandler {
     }
 
     @Override
-    public void onChatRoomMembersChanged(Contact chatRoom, Set<ChatRoomMember> membersJoined, Set<ChatRoomMember> membersLeft) {
+    public void onChatRoomMembersChanged(Contact chatRoom, Set<Contact> membersJoined, Set<Contact> membersLeft) {
         logger.info("onChatRoomMembersChanged");
     }
 
@@ -166,6 +166,36 @@ public class DefaultMessageHandler implements MessageHandler {
 
 	@Override
 	public void onQR(byte[] qrData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyReaded(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyEnterSession(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyInited(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifyQuitSession(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusNotifySyncConv(Message message) {
 		// TODO Auto-generated method stub
 		
 	}

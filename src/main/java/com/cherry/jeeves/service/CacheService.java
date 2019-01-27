@@ -172,4 +172,17 @@ public class CacheService {
     public Set<String> getContactNamesWithUnreadMessage() {
         return contactNamesWithUnreadMessage;
     }
+
+	public void setIndividuals(Set<Contact> individuals) {
+		this.individuals = individuals;
+	}
+
+	public void setMediaPlatforms(Set<Contact> mediaPlatforms) {
+		this.mediaPlatforms = mediaPlatforms;
+	}
+
+	public void setChatRooms(Set<Contact> chatRooms) {
+		this.chatRooms = chatRooms;
+	}
+    
 }

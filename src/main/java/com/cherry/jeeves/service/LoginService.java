@@ -2,6 +2,8 @@ package com.cherry.jeeves.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import com.cherry.jeeves.domain.response.InitResponse;
 import com.cherry.jeeves.domain.response.LoginResult;
 import com.cherry.jeeves.domain.response.StatusNotifyResponse;
 import com.cherry.jeeves.domain.shared.ChatRoomDescription;
+import com.cherry.jeeves.domain.shared.Contact;
 import com.cherry.jeeves.domain.shared.Token;
 import com.cherry.jeeves.enums.LoginCode;
 import com.cherry.jeeves.enums.StatusNotifyCode;
@@ -129,6 +132,13 @@ public class LoginService {
 			
 			logger.info("[8] status notify completed");
 			//9 get contact
+			Set<Contact> initChatRooms =  Arrays.stream(initResponse.getChatSet().split(","))
+			.filter(x -> x != null && x.startsWith("@@")).map(x -> {
+				Contact contact = new Contact();
+				contact.setUserName(x);
+				return contact;
+			}).collect(Collectors.toSet());
+			cacheService.getChatRooms().addAll(initChatRooms);
 			long seq = 0;
 			do {
 				GetContactResponse getContactResponse = wechatHttpServiceInternal.getContact(seq);
@@ -138,23 +148,35 @@ public class LoginService {
 				seq = getContactResponse.getSeq();
 				cacheService.getIndividuals().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isIndividual).collect(Collectors.toSet()));
 				cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isMediaPlatform).collect(Collectors.toSet()));
+				cacheService.getChatRooms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isChatRoom).collect(Collectors.toSet()));
 			} while (seq > 0);
 			logger.info("[9] get contact completed");
 			//10 batch get contact
-			ChatRoomDescription[] chatRoomDescriptions = initResponse.getContactList().stream()
-				.filter(x -> x != null && WechatUtils.isChatRoom(x))
-				.map(x -> {
-					ChatRoomDescription description = new ChatRoomDescription();
-					description.setUserName(x.getUserName());
-					return description;
-				})
-				.toArray(ChatRoomDescription[]::new);
-			if (chatRoomDescriptions.length > 0) {
-				BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(chatRoomDescriptions);
-				WechatUtils.checkBaseResponse(batchGetContactResponse);
-				logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
-				cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
+			
+			long loop = 0;
+			while(true){
+				ChatRoomDescription[] chatRoomDescriptions = cacheService.getChatRooms().stream().skip(loop*50).limit(50)
+					.map(x -> {
+						ChatRoomDescription description = new ChatRoomDescription();
+						description.setUserName(x.getUserName());
+						return description;
+					})
+					.toArray(ChatRoomDescription[]::new);
+				if (chatRoomDescriptions.length > 0) {
+					BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(chatRoomDescriptions);
+					WechatUtils.checkBaseResponse(batchGetContactResponse);
+					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
+					batchGetContactResponse.getContactList().forEach(x -> {
+						cacheService.getChatRooms().remove(x);
+						cacheService.getChatRooms().add(x);
+		            });
+//					cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
+				} else {
+					break;
+				}
+				loop++;
 			}
+			
 			logger.info("[10] batch get contact completed");
 			cacheService.setAlive(true);
 			logger.info("[*] login process completed");

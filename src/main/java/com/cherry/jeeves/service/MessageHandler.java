@@ -1,13 +1,12 @@
 package com.cherry.jeeves.service;
 
-import com.cherry.jeeves.domain.shared.ChatRoomMember;
+import java.io.IOException;
+import java.util.Set;
+
 import com.cherry.jeeves.domain.shared.Contact;
 import com.cherry.jeeves.domain.shared.Member;
 import com.cherry.jeeves.domain.shared.Message;
 import com.cherry.jeeves.domain.shared.RecommendInfo;
-
-import java.io.IOException;
-import java.util.Set;
 
 public interface MessageHandler {
 	
@@ -166,6 +165,43 @@ public interface MessageHandler {
     
     
     
+    /**
+     * 事件：收到状态同步消息：消息已读
+     *
+     * @param message		消息体
+     */
+    void onStatusNotifyReaded(Message message);
+    
+    /**
+     * 事件：收到状态同步消息：发起会话
+     *
+     * @param message		消息体
+     */
+    void onStatusNotifyEnterSession(Message message);
+    
+    /**
+     * 事件：收到状态同步消息：正在输入
+     *
+     * @param message		消息体
+     */
+    void onStatusNotifyInited(Message message);
+    
+    /**
+     * 事件：收到状态同步消息：通讯录同步
+     *
+     * @param message		消息体
+     */
+    void onStatusNotifySyncConv(Message message);
+    
+    /**
+     * 事件：收到状态同步消息：关闭会话
+     *
+     * @param message		消息体
+     */
+    void onStatusNotifyQuitSession(Message message);
+
+    
+    
     
     
     
@@ -191,7 +227,7 @@ public interface MessageHandler {
      * @param membersJoined 新加入的群成员
      * @param membersLeft   离开的群成员
      */
-    void onChatRoomMembersChanged(Contact chatRoom, Set<ChatRoomMember> membersJoined, Set<ChatRoomMember> membersLeft);
+    void onChatRoomMembersChanged(Contact chatRoom, Set<Contact> membersJoined, Set<Contact> membersLeft);
 
     /**
      * 事件：发现新增群（例如加入了新群）
