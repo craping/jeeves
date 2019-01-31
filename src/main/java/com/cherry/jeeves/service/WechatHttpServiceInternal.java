@@ -215,13 +215,13 @@ class WechatHttpServiceInternal {
         CookieStore store = (CookieStore) ((StatefullRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
         Date maxDate = new Date(Long.MAX_VALUE);
         String domain = WECHAT_URL_ENTRY.replaceAll("https://", "").replaceAll("/", "");
-        Map<String, String> cookies = new HashMap<>(3);
         cookies.put("MM_WX_NOTIFY_STATE", "1");
         cookies.put("MM_WX_SOUND_STATE", "1");
         if (retryTimes > 0) {
             cookies.put("refreshTimes", String.valueOf(retryTimes));
         }
         appendAdditionalCookies(store, cookies, domain, "/", maxDate);
+        cookies = store.getCookies().stream().collect(Collectors.toMap(Cookie::getName, Cookie::getValue, (k1, k2)-> k2));
         //It's now at entry page.
         this.originValue = WECHAT_URL_ENTRY;
         this.refererValue = WECHAT_URL_ENTRY.replaceAll("/$", "");
@@ -366,7 +366,6 @@ class WechatHttpServiceInternal {
         CookieStore store = (CookieStore) ((StatefullRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
         Date maxDate = new Date(Long.MAX_VALUE);
         String domain = cacheService.getHostUrl().replaceAll("https://", "").replaceAll("/", "");
-        Map<String, String> cookies = new HashMap<>(3);
         cookies.put("MM_WX_NOTIFY_STATE", "1");
         cookies.put("MM_WX_SOUND_STATE", "1");
         appendAdditionalCookies(store, cookies, domain, "/", maxDate);
@@ -378,6 +377,7 @@ class WechatHttpServiceInternal {
         HeaderUtils.assign(customHeader, postHeader);
         ResponseEntity<String> responseEntity
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
+        cookies = store.getCookies().stream().collect(Collectors.toMap(Cookie::getName, Cookie::getValue, (k1, k2)-> k2));
         return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), InitResponse.class);
     }
 
@@ -943,5 +943,13 @@ class WechatHttpServiceInternal {
 	public void setSynccheckTimeMillis(long synccheckTimeMillis) {
 		this.synccheckTimeMillis = synccheckTimeMillis;
 	}
-    
+
+	public Map<String, String> getCookies() {
+		return cookies;
+	}
+
+	public void setCookies(Map<String, String> cookies) {
+		this.cookies = cookies;
+	}
+	
 }
