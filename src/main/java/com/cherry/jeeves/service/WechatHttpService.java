@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,8 @@ public class WechatHttpService {
     private WechatHttpServiceInternal wechatHttpServiceInternal;
     @Autowired
     private CacheService cacheService;
-
+    @Autowired(required = false)
+    private MessageHandler messageHandler;
     /**
      * Log out
      *
@@ -118,6 +120,27 @@ public class WechatHttpService {
     	if(chatRoom == null)
     		return null;
     	
+    	String encryChatRoomId = chatRoom.getEncryChatRoomId();
+    	
+    	if(encryChatRoomId == null || encryChatRoomId.isEmpty()){
+    		ChatRoomDescription description = new ChatRoomDescription();
+			description.setUserName(chatRoom.getUserName());
+    		ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
+    		BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
+    		for (Contact c : response.getContactList()) {
+    			if(!chatRoom.getSeq().equals(c.getSeq())){
+    				Map<String, String> seqMap = new HashMap<>();
+					seqMap.put(chatRoom.getSeq(), c.getSeq());
+					if (messageHandler != null) {
+			            messageHandler.onMembersSeqChanged(seqMap);
+			        }
+				}
+    			cacheService.getChatRooms().remove(c);
+    			cacheService.getChatRooms().add(c);
+    			chatRoom = c;
+			}
+    	}
+    	
 		long loop = 0;
 		while (true) {
 			ChatRoomDescription[] descriptions = chatRoom.getMemberList().stream()
@@ -125,13 +148,12 @@ public class WechatHttpService {
 				.limit(50)
 				.map(x -> {
 					ChatRoomDescription description = new ChatRoomDescription();
-					description.setEncryChatRoomId(x.getEncryChatRoomId());
+					description.setEncryChatRoomId(encryChatRoomId);
 					description.setUserName(x.getUserName());
 					return description;
 				}).toArray(ChatRoomDescription[]::new);
 			if (descriptions.length > 0) {
 				BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
-				WechatUtils.checkBaseResponse(response);
 				for (Contact c : response.getContactList()) {
 					chatRoom.getMemberList().remove(c);
 					chatRoom.getMemberList().add(c);

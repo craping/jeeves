@@ -5,7 +5,9 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -96,11 +98,15 @@ public class SyncServie {
 //        System.out.println("sync 返回[SyncCheckKey]:"+cacheService.getSyncCheckKey().toString());
         //mod包含新增和修改
         if (syncResponse.getModContactCount() > 0) {
-            onContactsModified(syncResponse.getModContactList());
+        	new Thread(() ->{
+        		onContactsModified(syncResponse.getModContactList());
+        	}).start();
         }
         //del->联系人移除
         if (syncResponse.getDelContactCount() > 0) {
-            onContactsDeleted(syncResponse.getDelContactList());
+        	new Thread(() ->{
+        		onContactsDeleted(syncResponse.getDelContactList());
+        	}).start();
         }
         return syncResponse;
     }
@@ -325,12 +331,19 @@ public class SyncServie {
                 chatRooms.add(contact);
             }
         }
-
+        Map<String, String> seqMap = new HashMap<>();
         //individual
         if (individuals.size() > 0) {
             Set<Contact> existingIndividuals = cacheService.getIndividuals();
             Set<Contact> newIndividuals = individuals.stream().filter(x -> !existingIndividuals.contains(x)).collect(Collectors.toSet());
             individuals.forEach(x -> {
+            	//更新seq唯一值
+            	for (Contact c : existingIndividuals) {
+					if(x.equals(c) && !x.getSeq().equals(c.getSeq())){
+						seqMap.put(c.getSeq(), x.getSeq());
+						break;
+					}
+				}
                 existingIndividuals.remove(x);
                 existingIndividuals.add(x);
             });
@@ -343,13 +356,49 @@ public class SyncServie {
             Set<Contact> existingChatRooms = cacheService.getChatRooms();
             Set<Contact> newChatRooms = new HashSet<>();
             Set<Contact> modifiedChatRooms = new HashSet<>();
-            for (Contact chatRoom : chatRooms) {
-                if (existingChatRooms.contains(chatRoom)) {
-                    modifiedChatRooms.add(chatRoom);
-                } else {
-                    newChatRooms.add(chatRoom);
-                }
-            }
+            
+            long loop = 0;
+			while (true) {
+				ChatRoomDescription[] chatRoomDescriptions = chatRooms.stream()
+					.skip(loop * 50)
+					.limit(50)
+					.map(x -> {
+						ChatRoomDescription description = new ChatRoomDescription();
+						description.setUserName(x.getUserName());
+						return description;
+					}).toArray(ChatRoomDescription[]::new);
+				if (chatRoomDescriptions.length > 0) {
+					BatchGetContactResponse batchGetContactResponse = wechatHttpService
+							.batchGetContact(chatRoomDescriptions);
+					WechatUtils.checkBaseResponse(batchGetContactResponse);
+					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
+					batchGetContactResponse.getContactList().forEach(x -> {
+		            	if (existingChatRooms.contains(x)) {
+		            		//更新seq唯一值
+			            	for (Contact c : existingChatRooms) {
+								if(x.equals(c) && !x.getSeq().equals(c.getSeq())){
+									seqMap.put(c.getSeq(), x.getSeq());
+									break;
+								}
+							}
+		                    modifiedChatRooms.add(x);
+		                } else {
+		                    newChatRooms.add(x);
+		                }
+					});
+				} else {
+					break;
+				}
+				loop++;
+			}
+			
+//            for (Contact chatRoom : chatRooms) {
+//                if (existingChatRooms.contains(chatRoom)) {
+//                    modifiedChatRooms.add(chatRoom);
+//                } else {
+//                    newChatRooms.add(chatRoom);
+//                }
+//            }
             existingChatRooms.addAll(newChatRooms);
             if (messageHandler != null && newChatRooms.size() > 0) {
                 messageHandler.onNewChatRoomsFound(newChatRooms);
@@ -383,6 +432,10 @@ public class SyncServie {
             if (messageHandler != null && newMediaPlatforms.size() > 0) {
                 messageHandler.onNewMediaPlatformsFound(newMediaPlatforms);
             }
+        }
+        
+        if (messageHandler != null && seqMap.size() > 0) {
+            messageHandler.onMembersSeqChanged(seqMap);
         }
     }
 

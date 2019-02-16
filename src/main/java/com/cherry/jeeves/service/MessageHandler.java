@@ -1,6 +1,7 @@
 package com.cherry.jeeves.service;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import com.cherry.jeeves.domain.shared.Contact;
@@ -199,7 +200,14 @@ public interface MessageHandler {
      * @param message		消息体
      */
     void onStatusNotifyQuitSession(Message message);
-
+    /**
+     * 事件：所有联系人seq发生变化
+     *
+     * @param chatRoom      群
+     * @param membersJoined 新加入的群成员
+     * @param membersLeft   离开的群成员
+     */
+    void onMembersSeqChanged(Map<String, String> seqMap);
     
     
     

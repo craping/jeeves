@@ -175,4 +175,12 @@ public class Member {
     public void setSnsFlag(long snsFlag) {
         SnsFlag = snsFlag;
     }
+    
+    @JsonProperty
+    public String getSeq(){
+    	if(this.HeadImgUrl == null || !this.HeadImgUrl.contains("seq="))
+    		return null;
+    	String sub = this.HeadImgUrl.substring(this.HeadImgUrl.indexOf("seq=")+4);
+    	return sub.substring(0, sub.indexOf("&"));
+    }
 }

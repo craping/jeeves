@@ -1,6 +1,7 @@
 package com.cherry.jeeves.service;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -196,6 +197,12 @@ public class DefaultMessageHandler implements MessageHandler {
 
 	@Override
 	public void onStatusNotifySyncConv(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMembersSeqChanged(Map<String, String> seqMap) {
 		// TODO Auto-generated method stub
 		
 	}

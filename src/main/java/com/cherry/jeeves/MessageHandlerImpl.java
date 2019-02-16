@@ -3,6 +3,7 @@ package com.cherry.jeeves;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -328,6 +329,12 @@ public class MessageHandlerImpl implements MessageHandler {
 
 	@Override
 	public void onStatusNotifySyncConv(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onMembersSeqChanged(Map<String, String> seqMap) {
 		// TODO Auto-generated method stub
 		
 	}
