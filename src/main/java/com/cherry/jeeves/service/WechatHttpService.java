@@ -221,8 +221,8 @@ public class WechatHttpService {
      * @param url image url
      * @return image data
      */
-    public void download(String url, String fileName, MessageType type) {
-        wechatHttpServiceInternal.download(url, fileName, type);
+    public String download(String url, String fileName, MessageType type) {
+        return wechatHttpServiceInternal.download(url, fileName, type);
     }
 
     /**
