@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -19,8 +21,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.client.CookieStore;
@@ -588,12 +588,16 @@ class WechatHttpServiceInternal {
 		if (!f.exists() && f.isFile()) {
 			return null;
 		}
-		String mimeType = new MimetypesFileTypeMap().getContentType(f);
+		String mimeType = Files.probeContentType(Paths.get(filePath));
 		String mediaType = "";
 		if (mimeType == null) {
 			mimeType = "text/plain";
+		} else if (mimeType.split("/")[0].equals("image")) {
+			mediaType = "pic";
+		} else if (mimeType.split("/")[0].equals("video")) {
+			mediaType = "video";
 		} else {
-			mediaType = mimeType.split("/")[0].equals("image") ? "pic" : "doc";
+			mediaType = "doc";
 		}
 		FileSystemResource resource = new FileSystemResource(f);
 		
