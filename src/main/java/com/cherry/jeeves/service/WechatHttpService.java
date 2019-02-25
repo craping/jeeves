@@ -61,34 +61,34 @@ public class WechatHttpService {
      * @param content  the content of text
      * @throws IOException if sendText fails
      */
-    public void sendText(String userName, String content) throws IOException {
+    public SendMsgResponse sendText(String userName, String content) throws IOException {
         notifyNecessary(userName);
-        wechatHttpServiceInternal.sendText(userName, content);
+        return wechatHttpServiceInternal.sendText(userName, content);
     }
     
-    public void sendImage(String userName, String imgUrl) throws IOException {
+    public SendMsgResponse sendImage(String userName, String imgUrl) throws IOException {
         notifyNecessary(userName);
-        wechatHttpServiceInternal.sendImage(userName, imgUrl);
+        return wechatHttpServiceInternal.sendImage(userName, imgUrl);
     }
     
-    public void sendEmoticon(String userName, String emoticonUrl) throws IOException {
+    public SendMsgResponse sendEmoticon(String userName, String emoticonUrl) throws IOException {
         notifyNecessary(userName);
-        wechatHttpServiceInternal.sendEmoticon(userName, emoticonUrl);
+        return wechatHttpServiceInternal.sendEmoticon(userName, emoticonUrl);
     }
     
-    public void sendVideo(String userName, String videoUrl) throws IOException {
+    public SendMsgResponse sendVideo(String userName, String videoUrl) throws IOException {
         notifyNecessary(userName);
-        wechatHttpServiceInternal.sendVideo(userName, videoUrl);
+        return wechatHttpServiceInternal.sendVideo(userName, videoUrl);
     }
     
-    public void sendApp(String userName, String mediaUrl) throws IOException {
+    public SendMsgResponse sendApp(String userName, String mediaUrl) throws IOException {
         notifyNecessary(userName);
-        wechatHttpServiceInternal.sendApp(userName, mediaUrl);
+        return wechatHttpServiceInternal.sendApp(userName, mediaUrl);
     }
     
-    public void forwardMsg(String userName, Message message) throws IOException {
+    public SendMsgResponse forwardMsg(String userName, Message message) throws IOException {
         notifyNecessary(userName);
-        wechatHttpServiceInternal.forwardMsg(userName, message);
+        return wechatHttpServiceInternal.forwardMsg(userName, message);
     }
     /**
      * Set the alias of a contact
