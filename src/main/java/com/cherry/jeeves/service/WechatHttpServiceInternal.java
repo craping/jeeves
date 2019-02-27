@@ -591,7 +591,8 @@ class WechatHttpServiceInternal {
 		String mimeType = Files.probeContentType(Paths.get(filePath));
 		String mediaType = "";
 		if (mimeType == null) {
-			mimeType = "text/plain";
+			mimeType = "application/octet-stream";
+			mediaType = "doc";
 		} else if (mimeType.split("/")[0].equals("image")) {
 			mediaType = "pic";
 		} else if (mimeType.split("/")[0].equals("video")) {
