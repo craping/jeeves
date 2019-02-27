@@ -154,7 +154,7 @@ public class SyncServie {
 	        			
 	        		} 
 	        		//图片
-	        		else if (message.getMsgType() == MessageType.IMAGE.getCode()) {
+	        		else if (message.getMsgType() == MessageType.IMAGE.getCode() || message.getAppMsgType() == AppMessageType.IMG.getCode()) {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String fullImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
 	        			String thumbImageUrl = fullImageUrl + "&type=slave";
@@ -168,7 +168,7 @@ public class SyncServie {
 	        			}
 	        		} 
 	        		//表情
-	        		else if (message.getMsgType() == MessageType.EMOTICON.getCode()) {
+	        		else if (message.getMsgType() == MessageType.EMOTICON.getCode() || message.getAppMsgType() == AppMessageType.EMOJI.getCode()) {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String emoticonUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
 	        			emoticonUrl = emoticonUrl + "&type=big";
@@ -224,7 +224,6 @@ public class SyncServie {
 	        		//系统消息
 	        		else if (message.getMsgType() == MessageType.SYS.getCode()) {
 	        			//红包
-	        			
 	        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
 	        				logger.info("[*] you've received a red packet");
 	        				String from = message.getFromUserName();
@@ -241,7 +240,7 @@ public class SyncServie {
 	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
 	        					messageHandler.onRedPacketReceived(contact);
 	        				}
-	        			}
+						}
 	        		}
 	        		//好友邀请
 	        		else if (message.getMsgType() == MessageType.VERIFYMSG.getCode() && cacheService.getOwner().getUserName().equals(message.getToUserName())) {
