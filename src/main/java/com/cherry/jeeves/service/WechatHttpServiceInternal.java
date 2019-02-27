@@ -588,7 +588,7 @@ class WechatHttpServiceInternal {
 		if (!f.exists() && f.isFile()) {
 			return null;
 		}
-		String mimeType = Files.probeContentType(Paths.get(filePath));
+		String mimeType = Files.probeContentType(f.toPath());
 		String mediaType = "";
 		if (mimeType == null) {
 			mimeType = "application/octet-stream";
