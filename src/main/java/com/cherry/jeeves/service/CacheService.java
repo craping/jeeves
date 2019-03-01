@@ -185,4 +185,25 @@ public class CacheService {
 		this.chatRooms = chatRooms;
 	}
     
+	public Contact searchContact(Set<Contact> contacts, String userName) {
+		if(contacts == null)
+			return null;
+		return contacts.stream().filter(individual -> userName.equals(individual.getUserName())).findFirst().orElse(null);
+	}
+	
+	public Contact getContact(String userName) {
+		return searchContact(individuals, userName);
+	}
+	
+	public Contact getChatRoom(String userName) {
+		return searchContact(chatRooms, userName);
+	}
+	
+	public Contact getChatRoomMember(String chatRoomUserName, String memberUserName) {
+		Contact chatRoom = searchContact(chatRooms, chatRoomUserName);
+		if(chatRoom != null && chatRoom.getMemberList() != null)
+			return searchContact(chatRoom.getMemberList(), memberUserName);
+		return null;
+	}
+	
 }
