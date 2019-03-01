@@ -1,24 +1,24 @@
 package com.cherry.jeeves.domain.response;
 
+import java.util.LinkedHashSet;
+
 import com.cherry.jeeves.domain.response.component.WechatHttpResponseBase;
 import com.cherry.jeeves.domain.shared.Contact;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Set;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BatchGetContactResponse extends WechatHttpResponseBase {
     @JsonProperty
-    private Set<Contact> ContactList;
+    private LinkedHashSet<Contact> ContactList;
     @JsonProperty
     private int Count;
 
-    public Set<Contact> getContactList() {
+    public LinkedHashSet<Contact> getContactList() {
         return ContactList;
     }
 
-    public void setContactList(Set<Contact> contactList) {
+    public void setContactList(LinkedHashSet<Contact> contactList) {
         ContactList = contactList;
     }
 

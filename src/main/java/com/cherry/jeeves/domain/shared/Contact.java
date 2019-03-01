@@ -1,16 +1,16 @@
 package com.cherry.jeeves.domain.shared;
 
+import java.util.LinkedHashSet;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Contact extends Member {
     @JsonProperty
     private int MemberCount;
     @JsonProperty
-    private Set<Contact> MemberList;
+    private LinkedHashSet<Contact> MemberList;
     @JsonProperty
     private int OwnerUin;
     @JsonProperty
@@ -132,11 +132,11 @@ public class Contact extends Member {
         MemberCount = memberCount;
     }
 
-    public Set<Contact> getMemberList() {
+    public LinkedHashSet<Contact> getMemberList() {
         return MemberList;
     }
 
-    public void setMemberList(Set<Contact> memberList) {
+    public void setMemberList(LinkedHashSet<Contact> memberList) {
         MemberList = memberList;
     }
 

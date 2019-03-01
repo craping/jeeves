@@ -141,28 +141,31 @@ public class WechatHttpService {
 			}
     	}
     	
-		long loop = 0;
-		while (true) {
-			ChatRoomDescription[] descriptions = chatRoom.getMemberList().stream()
-				.skip(loop * 50)
-				.limit(50)
-				.map(x -> {
-					ChatRoomDescription description = new ChatRoomDescription();
-					description.setEncryChatRoomId(encryChatRoomId);
-					description.setUserName(x.getUserName());
-					return description;
-				}).toArray(ChatRoomDescription[]::new);
-			if (descriptions.length > 0) {
-				BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
-				for (Contact c : response.getContactList()) {
-					chatRoom.getMemberList().remove(c);
-					chatRoom.getMemberList().add(c);
+    	Contact member = chatRoom.getMemberList().stream().findFirst().orElse(null);
+    	if(member.getHeadImgUrl() == null || member.getHeadImgUrl().isEmpty()){
+			long loop = 0;
+			while (true) {
+				ChatRoomDescription[] descriptions = chatRoom.getMemberList().stream()
+					.skip(loop * 50)
+					.limit(50)
+					.map(x -> {
+						ChatRoomDescription description = new ChatRoomDescription();
+						description.setEncryChatRoomId(encryChatRoomId);
+						description.setUserName(x.getUserName());
+						return description;
+					}).toArray(ChatRoomDescription[]::new);
+				if (descriptions.length > 0) {
+					BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
+					for (Contact c : response.getContactList()) {
+						chatRoom.getMemberList().remove(c);
+						chatRoom.getMemberList().add(c);
+					}
+				} else {
+					break;
 				}
-			} else {
-				break;
+				loop++;
 			}
-			loop++;
-		}
+    	}
         return chatRoom;
     }
 

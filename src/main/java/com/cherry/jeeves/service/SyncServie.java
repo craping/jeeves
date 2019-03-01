@@ -417,6 +417,34 @@ public class SyncServie {
                     if (joined.size() > 0 || left.size() > 0) {
                         messageHandler.onChatRoomMembersChanged(chatRoom, joined, left);
                     }
+                    //获取新加入成员头像信息
+                    if(joined.size() > 0){
+                    	loop = 0;
+            			while (true) {
+            				ChatRoomDescription[] chatRoomDescriptions = joined.stream()
+            					.skip(loop * 50)
+            					.limit(50)
+            					.map(x -> {
+            						ChatRoomDescription description = new ChatRoomDescription();
+            						description.setEncryChatRoomId(chatRoom.getEncryChatRoomId());
+            						description.setUserName(x.getUserName());
+            						return description;
+            					}).toArray(ChatRoomDescription[]::new);
+            				if (chatRoomDescriptions.length > 0) {
+            					BatchGetContactResponse batchGetContactResponse = wechatHttpService
+            							.batchGetContact(chatRoomDescriptions);
+            					WechatUtils.checkBaseResponse(batchGetContactResponse);
+            					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
+            					batchGetContactResponse.getContactList().forEach(x -> {
+            						chatRoom.getMemberList().remove(x);
+            						chatRoom.getMemberList().add(x);
+            					});
+            				} else {
+            					break;
+            				}
+            				loop++;
+            			}
+                    }
                 }
             }
         }
