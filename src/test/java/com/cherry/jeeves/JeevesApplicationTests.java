@@ -1,11 +1,18 @@
 package com.cherry.jeeves;
 
+import java.io.File;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.activation.MimetypesFileTypeMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,5 +40,18 @@ public class JeevesApplicationTests {
 		String headUrl = "/cgi-bin/mmwebwx-bin/webwxgeticon?seq=664173328&username=@6a4622796635b5f055e06e56b910381a&skey=@crypt_1bdac1b9_d1165124dfd11704410deee2a2a53677";
 		String sub = headUrl.substring(headUrl.indexOf("seq=")+4);
 		System.out.println(sub.substring(0, sub.indexOf("&")));
+		
+		
+		String path = "C:\\Users\\Crap\\Documents\\WeChat Files\\oh_Boo\\Video\\e85b4d3919f48240948be0bb51c9803a.mp4";
+		String mimeType = new MimetypesFileTypeMap().getContentType(new File(path));
+		System.out.println(mimeType);
+		
+		FileNameMap fileNameMap = URLConnection.getFileNameMap(); 
+		String type = fileNameMap.getContentTypeFor("E:\\yousayidoprop.rar");
+		System.out.println(type);
+		System.out.println(Files.probeContentType(Paths.get(path)));
+		System.out.println(Files.probeContentType(new File("E:\\yousayidoprop.rar").toPath()));
+		System.out.println(new File("E:\\yousayidoprop.rar").toPath());
+		System.out.println(Files.probeContentType(new File("E:\\test.txt").toPath()));
 	}
 }

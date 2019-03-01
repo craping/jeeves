@@ -1,15 +1,17 @@
 package com.cherry.jeeves.service;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.springframework.stereotype.Component;
+
 import com.cherry.jeeves.domain.request.component.BaseRequest;
 import com.cherry.jeeves.domain.shared.Contact;
 import com.cherry.jeeves.domain.shared.Owner;
 import com.cherry.jeeves.domain.shared.SyncCheckKey;
 import com.cherry.jeeves.domain.shared.SyncKey;
 import com.cherry.jeeves.utils.DeviceIdGenerator;
-import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Component
 public class CacheService {
@@ -46,9 +48,9 @@ public class CacheService {
     private String uin;
     private String sid;
 
-    private Set<Contact> individuals = new HashSet<>();
-    private Set<Contact> mediaPlatforms = new HashSet<>();
-    private Set<Contact> chatRooms = new HashSet<>();
+    private Set<Contact> individuals = new LinkedHashSet<>();
+    private Set<Contact> mediaPlatforms = new LinkedHashSet<>();
+    private Set<Contact> chatRooms = new LinkedHashSet<>();
 
     private Set<String> contactNamesWithUnreadMessage = new HashSet<>();
 
@@ -188,7 +190,7 @@ public class CacheService {
 	public Contact searchContact(Set<Contact> contacts, String userName) {
 		if(contacts == null)
 			return null;
-		return contacts.stream().filter(individual -> userName.equals(individual.getUserName())).findFirst().orElse(null);
+		return contacts.stream().filter(x -> userName.equals(x.getUserName())).findFirst().orElse(null);
 	}
 	
 	public Contact getContact(String userName) {
