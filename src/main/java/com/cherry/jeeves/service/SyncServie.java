@@ -127,7 +127,8 @@ public class SyncServie {
     }
 
     private boolean isMessageFromChatRoom(Message message) {
-        return message.getFromUserName() != null && message.getFromUserName().startsWith("@@");
+        return (message.getFromUserName() != null && message.getFromUserName().startsWith("@@"))
+        		|| (message.getToUserName() != null && message.getToUserName().startsWith("@@"));
     }
 
     private void onNewMessage() throws IOException, URISyntaxException {
@@ -143,13 +144,13 @@ public class SyncServie {
 	        		//文本消息
 	        		if (message.getMsgType() == MessageType.TEXT.getCode()) {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			//个人
-	        			if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateTextMessage(message);
-	        			}
 	        			//群
-	        			else if (isMessageFromChatRoom(message)) {
+	        			if (isMessageFromChatRoom(message)) {
 	        				messageHandler.onReceivingChatRoomTextMessage(message);
+	        			}
+	        			//个人
+	        			else if (isMessageFromIndividual(message)) {
+	        				messageHandler.onReceivingPrivateTextMessage(message);
 	        			}
 	        			
 	        		} 
@@ -158,13 +159,13 @@ public class SyncServie {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String fullImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
 	        			String thumbImageUrl = fullImageUrl + "&type=slave";
-	        			//个人
-	        			if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateImageMessage(message, thumbImageUrl, fullImageUrl);
-	        			}
 	        			//群
-	        			else if (isMessageFromChatRoom(message)) {
+	        			if (isMessageFromChatRoom(message)) {
 	        				messageHandler.onReceivingChatRoomImageMessage(message, thumbImageUrl, fullImageUrl);
+	        			}
+	        			//个人
+	        			else if (isMessageFromIndividual(message)) {
+	        				messageHandler.onReceivingPrivateImageMessage(message, thumbImageUrl, fullImageUrl);
 	        			}
 	        		} 
 	        		//表情
@@ -172,26 +173,26 @@ public class SyncServie {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String emoticonUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
 	        			emoticonUrl = emoticonUrl + "&type=big";
-	        			//个人
-	        			if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateEmoticonMessage(message, emoticonUrl);
-	        			}
 	        			//群
-	        			else if (isMessageFromChatRoom(message)) {
+	        			if (isMessageFromChatRoom(message)) {
 	        				messageHandler.onReceivingChatRoomEmoticonMessage(message, emoticonUrl);
+	        			}
+	        			//个人
+	        			else if (isMessageFromIndividual(message)) {
+	        				messageHandler.onReceivingPrivateEmoticonMessage(message, emoticonUrl);
 	        			}
 	        		}
 	        		//语音消息
 	        		else if (message.getMsgType() == MessageType.VOICE.getCode()) {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String voiceUrl = String.format(WECHAT_URL_GET_VOICE, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
-	        			//个人
-	        			if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateVoiceMessage(message, voiceUrl);
-	        			}
 	        			//群
-	        			else if (isMessageFromChatRoom(message)) {
+	        			if (isMessageFromChatRoom(message)) {
 	        				messageHandler.onReceivingChatRoomVoiceMessage(message, voiceUrl);
+	        			}
+	        			//个人
+	        			else if (isMessageFromIndividual(message)) {
+	        				messageHandler.onReceivingPrivateVoiceMessage(message, voiceUrl);
 	        			}
 	        		}
 	        		//视频消息
@@ -199,26 +200,26 @@ public class SyncServie {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String videoUrl = String.format(WECHAT_URL_GET_VIDEO, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
 	        			String thumbImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey()) + "&type=slave";
-	        			//个人
-	        			if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateVideoMessage(message, thumbImageUrl, videoUrl);
-	        			}
 	        			//群
-	        			else if (isMessageFromChatRoom(message)) {
+	        			if (isMessageFromChatRoom(message)) {
 	        				messageHandler.onReceivingChatRoomVideoMessage(message, thumbImageUrl, videoUrl);
+	        			}
+	        			//个人
+	        			else if (isMessageFromIndividual(message)) {
+	        				messageHandler.onReceivingPrivateVideoMessage(message, thumbImageUrl, videoUrl);
 	        			}
 	        		}
 	        		//多媒体(文件)消息
 	        		else if (message.getMsgType() == MessageType.APP.getCode()) {
 	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
 	        			String mediaUrl = String.format(WECHAT_URL_GET_MEDIA, cacheService.getFileUrl(), message.getFromUserName(), message.getMediaId(), escape(message.getFileName()), cacheService.getPassTicket());
-	        			//个人
-	        			if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateMediaMessage(message, mediaUrl);
-	        			}
 	        			//群
-	        			else if (isMessageFromChatRoom(message)) {
+	        			if (isMessageFromChatRoom(message)) {
 	        				messageHandler.onReceivingChatRoomMediaMessage(message, mediaUrl);
+	        			}
+	        			//个人
+	        			else if (isMessageFromIndividual(message)) {
+	        				messageHandler.onReceivingPrivateMediaMessage(message, mediaUrl);
 	        			}
 	        		}
 	        		//系统消息
@@ -228,13 +229,13 @@ public class SyncServie {
 	        				logger.info("[*] you've received a red packet");
 	        				String from = message.getFromUserName();
 	        				Set<Contact> contacts = null;
-	        				//个人
-	        				if (isMessageFromIndividual(message)) {
-	        					contacts = cacheService.getIndividuals();
-	        				}
 	        				//群
-	        				else if (isMessageFromChatRoom(message)) {
+	        				if (isMessageFromChatRoom(message)) {
 	        					contacts = cacheService.getChatRooms();
+	        				}
+	        				//个人
+	        				else if (isMessageFromIndividual(message)) {
+	        					contacts = cacheService.getIndividuals();
 	        				}
 	        				if (contacts != null) {
 	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
