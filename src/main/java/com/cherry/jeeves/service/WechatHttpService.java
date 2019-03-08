@@ -54,6 +54,9 @@ public class WechatHttpService {
         return contacts;
     }
     
+    public UploadMediaResponse uploadMedia(String toUserName, String filePath) throws IOException {
+    	return wechatHttpServiceInternal.uploadMedia(toUserName, filePath);
+    }
     /**
      * Send plain text to a contact (not chatroom)
      *
@@ -66,30 +69,61 @@ public class WechatHttpService {
         return wechatHttpServiceInternal.sendText(userName, content);
     }
     
+    
     public SendMsgResponse sendImage(String userName, String imgUrl) throws IOException {
         notifyNecessary(userName);
         return wechatHttpServiceInternal.sendImage(userName, imgUrl);
     }
+    public SendMsgResponse sendImage(String userName, UploadMediaResponse media, int scene) throws IOException {
+        notifyNecessary(userName);
+        return wechatHttpServiceInternal.sendImage(userName, media, scene);
+    }
+    
+    
     
     public SendMsgResponse sendEmoticon(String userName, String emoticonUrl) throws IOException {
         notifyNecessary(userName);
         return wechatHttpServiceInternal.sendEmoticon(userName, emoticonUrl);
     }
+    public SendMsgResponse sendEmoticon(String userName, UploadMediaResponse media, int scene) throws IOException {
+        notifyNecessary(userName);
+        return wechatHttpServiceInternal.sendEmoticon(userName, media, scene);
+    }
+    
+    
     
     public SendMsgResponse sendVideo(String userName, String videoUrl) throws IOException {
         notifyNecessary(userName);
         return wechatHttpServiceInternal.sendVideo(userName, videoUrl);
     }
+    public SendMsgResponse sendVideo(String userName, UploadMediaResponse media, int scene) throws IOException {
+        notifyNecessary(userName);
+        return wechatHttpServiceInternal.sendVideo(userName, media, scene);
+    }
+    
+    
     
     public SendMsgResponse sendApp(String userName, String mediaUrl) throws IOException {
         notifyNecessary(userName);
         return wechatHttpServiceInternal.sendApp(userName, mediaUrl);
     }
+    public SendMsgResponse sendApp(String userName, UploadMediaResponse media, int scene) throws IOException {
+        notifyNecessary(userName);
+        return wechatHttpServiceInternal.sendApp(userName, media, scene);
+    }
+    
+    
     
     public SendMsgResponse forwardMsg(String userName, Message message) throws IOException {
         notifyNecessary(userName);
         return wechatHttpServiceInternal.forwardMsg(userName, message);
     }
+    public SendMsgResponse forwardMsg(String userName, UploadMediaResponse media, MessageType msgType) throws IOException {
+        notifyNecessary(userName);
+        return wechatHttpServiceInternal.forwardMsg(userName, media, msgType);
+    }
+    
+    
     /**
      * Set the alias of a contact
      *

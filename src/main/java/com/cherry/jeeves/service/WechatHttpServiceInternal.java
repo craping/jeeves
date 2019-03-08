@@ -663,7 +663,10 @@ class WechatHttpServiceInternal {
     
     SendMsgResponse sendImage(String toUserName, String imgUrl) throws IOException {
     	UploadMediaResponse media = uploadMedia(toUserName, imgUrl);
-        final int scene = 0;
+        return sendImage(toUserName, media, 0);
+    }
+    
+    SendMsgResponse sendImage(String toUserName, UploadMediaResponse media, int scene) throws IOException {
         final String rnd = System.currentTimeMillis() + String.valueOf((int)(Math.random() * 1e4));
         final String url = String.format(WECHAT_URL_SEND_MSG_IMG, cacheService.getHostUrl(), cacheService.getPassTicket());
         SendMsgRequest request = new SendMsgRequest();
@@ -687,7 +690,10 @@ class WechatHttpServiceInternal {
     
     SendMsgResponse sendEmoticon(String toUserName, String emoticonUrl) throws IOException {
     	UploadMediaResponse media = uploadMedia(toUserName, emoticonUrl);
-        final int scene = 0;
+        return sendEmoticon(toUserName, media, 0);
+    }
+    
+    SendMsgResponse sendEmoticon(String toUserName, UploadMediaResponse media, int scene) throws IOException {
         final String rnd = System.currentTimeMillis() + String.valueOf((int)(Math.random() * 1e4));
         final String url = String.format(WECHAT_URL_SEND_MSG_EMOTICON, cacheService.getHostUrl(), cacheService.getPassTicket());
         SendMsgRequest request = new SendMsgRequest();
@@ -711,7 +717,10 @@ class WechatHttpServiceInternal {
     
     SendMsgResponse sendVideo(String toUserName, String videoUrl) throws IOException {
     	UploadMediaResponse media = uploadMedia(toUserName, videoUrl);
-        final int scene = 0;
+    	return sendVideo(toUserName, media, 0);
+    }
+    
+    SendMsgResponse sendVideo(String toUserName, UploadMediaResponse media, int scene) throws IOException {
         final String rnd = System.currentTimeMillis() + String.valueOf((int)(Math.random() * 1e4));
         final String url = String.format(WECHAT_URL_SEND_MSG_VIDOE, cacheService.getHostUrl(), cacheService.getPassTicket());
         SendMsgRequest request = new SendMsgRequest();
@@ -735,7 +744,10 @@ class WechatHttpServiceInternal {
     
     SendMsgResponse sendApp(String toUserName, String mediaUrl) throws IOException {
     	UploadMediaResponse media = uploadMedia(toUserName, mediaUrl);
-        final int scene = 0;
+    	return sendApp(toUserName, media, 0);
+    }
+    
+    SendMsgResponse sendApp(String toUserName, UploadMediaResponse media, int scene) throws IOException {
         final String rnd = System.currentTimeMillis() + String.valueOf((int)(Math.random() * 1e4));
         final String url = String.format(WECHAT_URL_SEND_MSG_APP, cacheService.getHostUrl(), cacheService.getPassTicket());
         SendMsgRequest request = new SendMsgRequest();
@@ -758,7 +770,20 @@ class WechatHttpServiceInternal {
                 = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
         return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), SendMsgResponse.class);
     }
-
+    
+    SendMsgResponse forwardMsg(String toUserName, UploadMediaResponse media, MessageType msgType) throws IOException {
+    	switch (msgType) {
+		case IMAGE:
+			return sendImage(toUserName, media, 2);
+		case EMOTICON:
+			return sendEmoticon(toUserName, media, 2);
+		case VIDEO:
+			return sendVideo(toUserName, media, 2);
+		default:
+			return sendApp(toUserName, media, 2);
+		}
+    }
+    
     SendMsgResponse forwardMsg(String toUserName, Message message) throws IOException {
 //    	statusNotify(message.getFromUserName(), StatusNotifyCode.READED.getCode());
 //    	statusNotify(toUserName, StatusNotifyCode.READED.getCode());
