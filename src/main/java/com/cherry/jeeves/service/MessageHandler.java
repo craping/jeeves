@@ -285,4 +285,11 @@ public interface MessageHandler {
      * @param contact 发红包的个人或者群
      */
     void onRedPacketReceived(Contact contact);
+    
+    /**
+     * 事件：收到僵尸用户消息
+     *
+     * @param contact 僵尸用户
+     */
+    void onFriendVerify(Contact contact);
 }

@@ -222,27 +222,6 @@ public class SyncServie {
 	        				messageHandler.onReceivingPrivateMediaMessage(message, mediaUrl);
 	        			}
 	        		}
-	        		//系统消息
-	        		else if (message.getMsgType() == MessageType.SYS.getCode()) {
-	        			//红包
-	        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
-	        				logger.info("[*] you've received a red packet");
-	        				String from = message.getFromUserName();
-	        				Set<Contact> contacts = null;
-	        				//群
-	        				if (isMessageFromChatRoom(message)) {
-	        					contacts = cacheService.getChatRooms();
-	        				}
-	        				//个人
-	        				else if (isMessageFromIndividual(message)) {
-	        					contacts = cacheService.getIndividuals();
-	        				}
-	        				if (contacts != null) {
-	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
-	        					messageHandler.onRedPacketReceived(contact);
-	        				}
-						}
-	        		}
 	        		//好友邀请
 	        		else if (message.getMsgType() == MessageType.VERIFYMSG.getCode() && cacheService.getOwner().getUserName().equals(message.getToUserName())) {
 	        			if (messageHandler.onReceivingFriendInvitation(message.getRecommendInfo())) {
@@ -307,6 +286,44 @@ public class SyncServie {
 						//关闭会话
 						else if (message.getStatusNotifyCode() == StatusNotifyCode.QUIT_SESSION.getCode()) {
 							messageHandler.onStatusNotifyQuitSession(message);
+						}
+	        		}
+	        		//系统消息
+	        		else if (message.getMsgType() == MessageType.SYS.getCode()) {
+	        			//红包
+	        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
+	        				logger.info("[*] you've received a red packet");
+	        				String from = message.getFromUserName();
+	        				Set<Contact> contacts = null;
+	        				//群
+	        				if (isMessageFromChatRoom(message)) {
+	        					contacts = cacheService.getChatRooms();
+	        				}
+	        				//个人
+	        				else if (isMessageFromIndividual(message)) {
+	        					contacts = cacheService.getIndividuals();
+	        				}
+	        				if (contacts != null) {
+	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
+	        					messageHandler.onRedPacketReceived(contact);
+	        				}
+						}
+	        			//文本消息
+	        			else if(message.getContent() != null && message.getContent().contains("开启了朋友验证")){
+	        				String from = message.getFromUserName();
+	        				Set<Contact> contacts = null;
+	        				//群
+	        				if (isMessageFromChatRoom(message)) {
+	        					contacts = cacheService.getChatRooms();
+	        				}
+	        				//个人
+	        				else if (isMessageFromIndividual(message)) {
+	        					contacts = cacheService.getIndividuals();
+	        				}
+	        				if (contacts != null) {
+	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
+	        					messageHandler.onFriendVerify(contact);
+	        				}
 						}
 	        		}
         		} catch (Exception e) {

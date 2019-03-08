@@ -206,4 +206,10 @@ public class DefaultMessageHandler implements MessageHandler {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onFriendVerify(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
 }
