@@ -344,4 +344,10 @@ public class MessageHandlerImpl implements MessageHandler {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onFriendBlacklist(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
 }

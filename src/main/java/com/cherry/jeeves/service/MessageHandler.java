@@ -287,9 +287,16 @@ public interface MessageHandler {
     void onRedPacketReceived(Contact contact);
     
     /**
-     * 事件：收到僵尸用户消息
+     * 事件：被对方删除
      *
      * @param contact 僵尸用户
      */
     void onFriendVerify(Contact contact);
+    
+    /**
+     * 事件：被对方拉黑
+     *
+     * @param contact 僵尸用户
+     */
+    void onFriendBlacklist(Contact contact);
 }

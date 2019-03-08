@@ -308,7 +308,7 @@ public class SyncServie {
 	        					messageHandler.onRedPacketReceived(contact);
 	        				}
 						}
-	        			//文本消息
+	        			//被对方删除
 	        			else if(message.getContent() != null && message.getContent().contains("开启了朋友验证")){
 	        				String from = message.getFromUserName();
 	        				Set<Contact> contacts = null;
@@ -323,6 +323,23 @@ public class SyncServie {
 	        				if (contacts != null) {
 	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
 	        					messageHandler.onFriendVerify(contact);
+	        				}
+						}
+	        			//被对方拉黑
+	        			else if(message.getContent() != null && message.getContent().contains("但被对方拒收了")){
+	        				String from = message.getFromUserName();
+	        				Set<Contact> contacts = null;
+	        				//群
+	        				if (isMessageFromChatRoom(message)) {
+	        					contacts = cacheService.getChatRooms();
+	        				}
+	        				//个人
+	        				else if (isMessageFromIndividual(message)) {
+	        					contacts = cacheService.getIndividuals();
+	        				}
+	        				if (contacts != null) {
+	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
+	        					messageHandler.onFriendBlacklist(contact);
 	        				}
 						}
 	        		}
