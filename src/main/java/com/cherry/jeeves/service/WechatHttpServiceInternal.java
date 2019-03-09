@@ -771,7 +771,7 @@ class WechatHttpServiceInternal {
         return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), SendMsgResponse.class);
     }
     
-    SendMsgResponse forwardMsg(String toUserName, UploadMediaResponse media, MessageType msgType) throws IOException {
+    SendMsgResponse forwardAttachMsg(String toUserName, UploadMediaResponse media, MessageType msgType) throws IOException {
     	switch (msgType) {
 		case IMAGE:
 			return sendImage(toUserName, media, 2);
@@ -818,7 +818,7 @@ class WechatHttpServiceInternal {
     		+ "</title><des></des><action></action><type>6</type><content></content><url></url><lowurl></lowurl>"
     		+ "<appattach><totallen>" + message.getFileSize() + "</totallen><attachid>" + message.getMediaId()
     		+ "</attachid><fileext>" + (message.getFileName().contains(".")?message.getFileName().split("[.]")[1]:"") + "</fileext></appattach><extinfo></extinfo></appmsg>");
-        } if(message.getMsgType() == MessageType.EMOTICON.getCode()) {
+        } else if(message.getMsgType() == MessageType.EMOTICON.getCode()) {
         	msg.setType(message.getMsgType());
         	String xml = message.getContent().replace("<br/>", "").replace("&lt;", "<").replace("&gt;", ">").replace("&#39;", "'").replace("&quot;", "\"").replace("&amp;", "&");
         	Map<String, Map<String, String>> appmsg = xmlMapper.readValue(xml, new TypeReference<Map<String, Map<String, String>>>() {});

@@ -118,9 +118,9 @@ public class WechatHttpService {
         notifyNecessary(userName);
         return wechatHttpServiceInternal.forwardMsg(userName, message);
     }
-    public SendMsgResponse forwardMsg(String userName, UploadMediaResponse media, MessageType msgType) throws IOException {
+    public SendMsgResponse forwardAttachMsg(String userName, UploadMediaResponse media, MessageType msgType) throws IOException {
         notifyNecessary(userName);
-        return wechatHttpServiceInternal.forwardMsg(userName, media, msgType);
+        return wechatHttpServiceInternal.forwardAttachMsg(userName, media, msgType);
     }
     
     
