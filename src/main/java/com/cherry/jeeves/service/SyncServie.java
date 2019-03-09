@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -294,7 +295,7 @@ public class SyncServie {
 	        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
 	        				logger.info("[*] you've received a red packet");
 	        				String from = message.getFromUserName();
-	        				Set<Contact> contacts = null;
+	        				ConcurrentLinkedQueue<Contact> contacts = null;
 	        				//群
 	        				if (isMessageFromChatRoom(message)) {
 	        					contacts = cacheService.getChatRooms();
@@ -311,7 +312,7 @@ public class SyncServie {
 	        			//被对方删除
 	        			else if(message.getContent() != null && message.getContent().contains("开启了朋友验证")){
 	        				String from = message.getFromUserName();
-	        				Set<Contact> contacts = null;
+	        				ConcurrentLinkedQueue<Contact> contacts = null;
 	        				//群
 	        				if (isMessageFromChatRoom(message)) {
 	        					contacts = cacheService.getChatRooms();
@@ -328,7 +329,7 @@ public class SyncServie {
 	        			//被对方拉黑
 	        			else if(message.getContent() != null && message.getContent().contains("但被对方拒收了")){
 	        				String from = message.getFromUserName();
-	        				Set<Contact> contacts = null;
+	        				ConcurrentLinkedQueue<Contact> contacts = null;
 	        				//群
 	        				if (isMessageFromChatRoom(message)) {
 	        					contacts = cacheService.getChatRooms();
@@ -368,7 +369,7 @@ public class SyncServie {
         Map<String, String> seqMap = new HashMap<>();
         //individual
         if (individuals.size() > 0) {
-            Set<Contact> existingIndividuals = cacheService.getIndividuals();
+        	ConcurrentLinkedQueue<Contact> existingIndividuals = cacheService.getIndividuals();
             Set<Contact> newIndividuals = individuals.stream().filter(x -> !existingIndividuals.contains(x)).collect(Collectors.toSet());
             individuals.forEach(x -> {
             	//更新seq唯一值
@@ -387,7 +388,7 @@ public class SyncServie {
         }
         //chatroom
         if (chatRooms.size() > 0) {
-            Set<Contact> existingChatRooms = cacheService.getChatRooms();
+        	ConcurrentLinkedQueue<Contact> existingChatRooms = cacheService.getChatRooms();
             Set<Contact> newChatRooms = new HashSet<>();
             Set<Contact> modifiedChatRooms = new HashSet<>();
             
@@ -445,8 +446,8 @@ public class SyncServie {
                 existingChatRooms.remove(existingChatRoom);
                 existingChatRooms.add(chatRoom);
                 if (messageHandler != null) {
-                    Set<Contact> oldMembers = existingChatRoom.getMemberList();
-                    Set<Contact> newMembers = chatRoom.getMemberList();
+                	ConcurrentLinkedQueue<Contact> oldMembers = existingChatRoom.getMemberList();
+                	ConcurrentLinkedQueue<Contact> newMembers = chatRoom.getMemberList();
                     Set<Contact> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
                     Set<Contact> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
                     if (joined.size() > 0 || left.size() > 0) {
@@ -485,7 +486,7 @@ public class SyncServie {
         }
         if (mediaPlatforms.size() > 0) {
             //media platform
-            Set<Contact> existingPlatforms = cacheService.getMediaPlatforms();
+        	ConcurrentLinkedQueue<Contact> existingPlatforms = cacheService.getMediaPlatforms();
             Set<Contact> newMediaPlatforms = existingPlatforms.stream().filter(x -> !existingPlatforms.contains(x)).collect(Collectors.toSet());
             mediaPlatforms.forEach(x -> {
                 existingPlatforms.remove(x);

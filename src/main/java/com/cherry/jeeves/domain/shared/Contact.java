@@ -1,6 +1,6 @@
 package com.cherry.jeeves.domain.shared;
 
-import java.util.LinkedHashSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,7 @@ public class Contact extends Member {
     @JsonProperty
     private int MemberCount;
     @JsonProperty
-    private LinkedHashSet<Contact> MemberList;
+    private ConcurrentLinkedQueue<Contact> MemberList;
     @JsonProperty
     private int OwnerUin;
     @JsonProperty
@@ -132,11 +132,11 @@ public class Contact extends Member {
         MemberCount = memberCount;
     }
 
-    public LinkedHashSet<Contact> getMemberList() {
+    public ConcurrentLinkedQueue<Contact> getMemberList() {
         return MemberList;
     }
 
-    public void setMemberList(LinkedHashSet<Contact> memberList) {
+    public void setMemberList(ConcurrentLinkedQueue<Contact> memberList) {
         MemberList = memberList;
     }
 

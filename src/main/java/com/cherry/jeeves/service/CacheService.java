@@ -1,8 +1,8 @@
 package com.cherry.jeeves.service;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.springframework.stereotype.Component;
 
@@ -48,9 +48,9 @@ public class CacheService {
     private String uin;
     private String sid;
 
-    private Set<Contact> individuals = new LinkedHashSet<>();
-    private Set<Contact> mediaPlatforms = new LinkedHashSet<>();
-    private Set<Contact> chatRooms = new LinkedHashSet<>();
+    private ConcurrentLinkedQueue<Contact> individuals = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Contact> mediaPlatforms = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Contact> chatRooms = new ConcurrentLinkedQueue<>();
 
     private Set<String> contactNamesWithUnreadMessage = new HashSet<>();
 
@@ -143,15 +143,15 @@ public class CacheService {
         this.sid = sid;
     }
 
-    public Set<Contact> getIndividuals() {
+    public ConcurrentLinkedQueue<Contact> getIndividuals() {
         return individuals;
     }
 
-    public Set<Contact> getMediaPlatforms() {
+    public ConcurrentLinkedQueue<Contact> getMediaPlatforms() {
         return mediaPlatforms;
     }
 
-    public Set<Contact> getChatRooms() {
+    public ConcurrentLinkedQueue<Contact> getChatRooms() {
         return chatRooms;
     }
 
@@ -175,22 +175,22 @@ public class CacheService {
         return contactNamesWithUnreadMessage;
     }
 
-	public void setIndividuals(Set<Contact> individuals) {
+	public void setIndividuals(ConcurrentLinkedQueue<Contact> individuals) {
 		this.individuals = individuals;
 	}
 
-	public void setMediaPlatforms(Set<Contact> mediaPlatforms) {
+	public void setMediaPlatforms(ConcurrentLinkedQueue<Contact> mediaPlatforms) {
 		this.mediaPlatforms = mediaPlatforms;
 	}
 
-	public void setChatRooms(Set<Contact> chatRooms) {
+	public void setChatRooms(ConcurrentLinkedQueue<Contact> chatRooms) {
 		this.chatRooms = chatRooms;
 	}
     
-	public Contact searchContact(Set<Contact> contacts, String userNameOrSeq) {
+	public Contact searchContact(ConcurrentLinkedQueue<Contact> contacts, String userNameOrSeq) {
 		if(contacts == null)
 			return null;
-		return contacts.stream().filter(x -> userNameOrSeq.equals(x.getUserName()) || userNameOrSeq.equals(x.getSeq())).findFirst().orElse(null);
+		return contacts.stream().parallel().filter(x -> userNameOrSeq.equals(x.getUserName()) || userNameOrSeq.equals(x.getSeq())).findFirst().orElse(null);
 	}
 	
 	public Contact getContact(String userNameOrSeq) {
