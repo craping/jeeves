@@ -182,7 +182,9 @@ public class LoginService {
 			logger.info("[*] login process completed");
 			logger.info("[*] start listening");
 			wechatHttpServiceInternal.setSynccheckTimeMillis(System.currentTimeMillis());
-			syncServie.getMessageHandler().onLogin(initResponse.getUser());
+			new Thread(() -> {
+				syncServie.getMessageHandler().onLogin(initResponse.getUser());
+			}).start();
 			while (cacheService.isAlive()) {
 				if(Thread.currentThread().isInterrupted()) {
 					logger.info("[Logout] exit bye");
