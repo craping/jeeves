@@ -125,6 +125,9 @@ public class LoginService {
 			cacheService.setSyncKey(initResponse.getSyncKey());
 			cacheService.setOwner(initResponse.getUser());
 			logger.info("[7] init completed");
+			new Thread(() -> {
+				syncServie.getMessageHandler().onLogin(initResponse.getUser());
+			}).start();
 			//8 status notify
 			StatusNotifyResponse statusNotifyResponse =
 					wechatHttpServiceInternal.statusNotify(cacheService.getOwner().getUserName(), StatusNotifyCode.INITED.getCode());
@@ -182,9 +185,6 @@ public class LoginService {
 			logger.info("[*] login process completed");
 			logger.info("[*] start listening");
 			wechatHttpServiceInternal.setSynccheckTimeMillis(System.currentTimeMillis());
-			new Thread(() -> {
-				syncServie.getMessageHandler().onLogin(initResponse.getUser());
-			}).start();
 			while (cacheService.isAlive()) {
 				if(Thread.currentThread().isInterrupted()) {
 					logger.info("[Logout] exit bye");
