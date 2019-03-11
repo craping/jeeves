@@ -350,4 +350,10 @@ public class MessageHandlerImpl implements MessageHandler {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onContactCompleted() {
+		// TODO Auto-generated method stub
+		
+	}
 }

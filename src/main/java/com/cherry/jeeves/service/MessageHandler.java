@@ -50,6 +50,13 @@ public interface MessageHandler {
     void onLogout(Member member);
     
     /**
+     * 事件：联系人加载完毕
+     *
+     * @param message 消息体
+     */
+    void onContactCompleted();
+    
+    /**
      * 事件：收到群聊天文本消息
      *
      * @param message 消息体

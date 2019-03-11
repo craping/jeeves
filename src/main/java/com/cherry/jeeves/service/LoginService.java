@@ -156,11 +156,9 @@ public class LoginService {
 			logger.info("[9] get contact completed");
 			//10 batch get contact
 			
-//			long loop = 0;
 			while(true){
 				ChatRoomDescription[] chatRoomDescriptions = cacheService.getChatRooms().stream()
 					.filter(c -> c.getEncryChatRoomId() == null || c.getEncryChatRoomId().isEmpty())
-//					.skip(loop*50)
 					.limit(50)
 					.map(x -> {
 						ChatRoomDescription description = new ChatRoomDescription();
@@ -180,10 +178,10 @@ public class LoginService {
 				} else {
 					break;
 				}
-//				loop++;
 			}
-			
 			logger.info("[10] batch get contact completed");
+			syncServie.getMessageHandler().onContactCompleted();
+			
 			cacheService.setAlive(true);
 			logger.info("[*] login process completed");
 			logger.info("[*] start listening");
