@@ -156,9 +156,12 @@ public class LoginService {
 			logger.info("[9] get contact completed");
 			//10 batch get contact
 			
-			long loop = 0;
+//			long loop = 0;
 			while(true){
-				ChatRoomDescription[] chatRoomDescriptions = cacheService.getChatRooms().stream().skip(loop*50).limit(50)
+				ChatRoomDescription[] chatRoomDescriptions = cacheService.getChatRooms().stream()
+					.filter(c -> c.getEncryChatRoomId() == null || c.getEncryChatRoomId().isEmpty())
+//					.skip(loop*50)
+					.limit(50)
 					.map(x -> {
 						ChatRoomDescription description = new ChatRoomDescription();
 						description.setUserName(x.getUserName());
@@ -177,7 +180,7 @@ public class LoginService {
 				} else {
 					break;
 				}
-				loop++;
+//				loop++;
 			}
 			
 			logger.info("[10] batch get contact completed");
