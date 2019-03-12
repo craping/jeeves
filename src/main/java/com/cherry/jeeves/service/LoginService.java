@@ -135,13 +135,6 @@ public class LoginService {
 			
 			logger.info("[8] status notify completed");
 			//9 get contact
-			Set<Contact> initChatRooms =  Arrays.stream(initResponse.getChatSet().split(","))
-			.filter(x -> x != null && x.startsWith("@@")).map(x -> {
-				Contact contact = new Contact();
-				contact.setUserName(x);
-				return contact;
-			}).collect(Collectors.toSet());
-			cacheService.getChatRooms().addAll(initChatRooms);
 			long seq = 0;
 			do {
 				GetContactResponse getContactResponse = wechatHttpServiceInternal.getContact(seq);
@@ -153,6 +146,14 @@ public class LoginService {
 				cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isMediaPlatform).collect(Collectors.toSet()));
 				cacheService.getChatRooms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isChatRoom).collect(Collectors.toSet()));
 			} while (seq > 0);
+			
+			Set<Contact> initChatRooms =  Arrays.stream(initResponse.getChatSet().split(","))
+			.filter(x -> x != null && x.startsWith("@@")).map(x -> {
+				Contact contact = new Contact();
+				contact.setUserName(x);
+				return contact;
+			}).filter(c -> !cacheService.getChatRooms().contains(c)).collect(Collectors.toSet());
+			cacheService.getChatRooms().addAll(initChatRooms);
 			logger.info("[9] get contact completed");
 			//10 batch get contact
 			
