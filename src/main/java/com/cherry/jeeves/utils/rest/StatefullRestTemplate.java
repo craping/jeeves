@@ -9,11 +9,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,9 +33,13 @@ public class StatefullRestTemplate extends RestTemplate {
                 = new StatefullHttpComponentsClientHttpRequestFactory(httpClient, httpContext);
         super.setRequestFactory(statefullHttpComponentsClientHttpRequestFactory);
         List<HttpMessageConverter<?>> converters = this.getMessageConverters();
+        
         FormHttpMessageConverter formConverter = new FormHttpMessageConverter();
         formConverter.setCharset(Charset.forName("UTF8"));
         converters.add(formConverter);
+        
+        HttpMessageConverter<Resource> resource = new ResourceHttpMessageConverter();
+        converters.add(resource);
         
         for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {

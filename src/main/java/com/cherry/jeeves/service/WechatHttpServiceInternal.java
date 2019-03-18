@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -31,7 +32,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -93,7 +94,12 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 @Component
 class WechatHttpServiceInternal {
-
+	
+	 /**
+     * 上传媒体文件分片大小
+     */
+    private static final int UPLOAD_MEDIA_FILE_CHUNK_SIZE = 524288;
+    
     @Value("${wechat.url.entry}")
     private String WECHAT_URL_ENTRY;
     @Value("${wechat.url.uuid}")
@@ -510,8 +516,7 @@ class WechatHttpServiceInternal {
         customHeader.set(HttpHeaders.REFERER, cacheService.getSyncUrl() + "/");
         HeaderUtils.assign(customHeader, getHeader);
         try {
-	        ResponseEntity<String> responseEntity
-	                = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(customHeader), String.class);
+	        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(customHeader), String.class);
 	        String body = responseEntity.getBody();
 	        Matcher matcher = pattern.matcher(body);
 	        if (!matcher.find()) {
@@ -599,42 +604,57 @@ class WechatHttpServiceInternal {
 		} else {
 			mediaType = "doc";
 		}
-		FileSystemResource resource = new FileSystemResource(f);
-		
-		final long rnd = System.currentTimeMillis() * 10;
-        final String url = String.format(WECHAT_URL_UPLOAD_MEDIA, cacheService.getFileUrl());
-        UploadMediaRequest uploadmediarequest = new UploadMediaRequest();
-        uploadmediarequest.setBaseRequest(cacheService.getBaseRequest());
-        uploadmediarequest.setFromUserName(cacheService.getOwner().getUserName());
-        uploadmediarequest.setToUserName(toUserName);
-        uploadmediarequest.setClientMediaId(rnd);
-        uploadmediarequest.setFileMd5(DigestUtils.md5Hex(new FileInputStream(f)));
-        uploadmediarequest.setDataLen(f.length());
-        uploadmediarequest.setTotalLen(f.length());
-        uploadmediarequest.setMediaType(4);
-        uploadmediarequest.setUploadType(2);
+		byte[] mediaData = WechatUtils.getBytes(f);
+        int mediaLength = mediaData.length;
+		// 分片数量
+		int chunks = new BigDecimal(mediaLength).divide(new BigDecimal(UPLOAD_MEDIA_FILE_CHUNK_SIZE), 0, BigDecimal.ROUND_UP).intValue();
+		UploadMediaResponse response = null;
+		for (int chunk = 0; chunk < chunks; chunk++) {
+			int from = chunk * UPLOAD_MEDIA_FILE_CHUNK_SIZE;
+			int to = (chunk + 1) * UPLOAD_MEDIA_FILE_CHUNK_SIZE;
+			to = Math.min(to, mediaLength);
+			byte[] temp = Arrays.copyOfRange(mediaData, from, to);
+            
+	//		FileSystemResource resource = new FileSystemResource(f);
+			
+			final long rnd = System.currentTimeMillis() * 10;
+	        final String url = String.format(WECHAT_URL_UPLOAD_MEDIA, cacheService.getFileUrl());
+	        UploadMediaRequest uploadmediarequest = new UploadMediaRequest();
+	        uploadmediarequest.setBaseRequest(cacheService.getBaseRequest());
+	        uploadmediarequest.setFromUserName(cacheService.getOwner().getUserName());
+	        uploadmediarequest.setToUserName(toUserName);
+	        uploadmediarequest.setClientMediaId(rnd);
+	        uploadmediarequest.setFileMd5(DigestUtils.md5Hex(new FileInputStream(f)));
+	        uploadmediarequest.setDataLen(f.length());
+	        uploadmediarequest.setTotalLen(f.length());
+	        uploadmediarequest.setMediaType(4);
+	        uploadmediarequest.setUploadType(2);
+	        
+	        
+	        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+	        form.add("id", "WU_FILE_"+(fileId++));
+	        form.add("chunks", chunks);
+	        form.add("chunk", chunk);
+	        form.add("name", f.getName());
+	        form.add("type", mimeType);
+	        form.add("lastModifieDate", new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT 0800 (中国标准时间)'", Locale.US).format(new Timestamp(f.lastModified())));
+	        form.add("size", f.length());
+	        form.add("mediatype", mediaType);
+	        form.add("uploadmediarequest", jsonMapper.writeValueAsString(uploadmediarequest) );
+	        form.add("webwx_data_ticket", cookies.get("webwx_data_ticket"));
+	        form.add("pass_ticket", cacheService.getPassTicket());
+	        form.add("filename", new ByteArrayResource(temp, "form-data; filename=\"" + f.getName() + "\""));
+	        
+	        HttpHeaders customHeader = createPostCustomHeader();
+	        HeaderUtils.assign(customHeader, postHeader);
+	        customHeader.setContentType(MediaType.MULTIPART_FORM_DATA);
+	        ResponseEntity<String> responseEntity
+	                = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(form, customHeader), String.class);
+	        response = jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), UploadMediaResponse.class);
+	        response.setTitle(f.getName());
+	    	response.setFileext(f.getName().contains(".")?f.getName().split("[.]")[1]:"");
+        }
         
-        
-        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-        form.add("id", "WU_FILE_"+(fileId++));
-        form.add("name", f.getName());
-        form.add("type", mimeType);
-        form.add("lastModifieDate", new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT 0800 (中国标准时间)'", Locale.US).format(new Timestamp(f.lastModified())));
-        form.add("size", String.valueOf(f.length()));
-        form.add("mediatype", mediaType);
-        form.add("uploadmediarequest", jsonMapper.writeValueAsString(uploadmediarequest) );
-        form.add("webwx_data_ticket", cookies.get("webwx_data_ticket"));
-        form.add("pass_ticket", cacheService.getPassTicket());
-        form.add("filename", resource);
-        
-        HttpHeaders customHeader = createPostCustomHeader();
-        HeaderUtils.assign(customHeader, postHeader);
-        customHeader.setContentType(MediaType.MULTIPART_FORM_DATA);
-        ResponseEntity<String> responseEntity
-                = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(form, customHeader), String.class);
-        UploadMediaResponse response = jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), UploadMediaResponse.class);
-        response.setTitle(f.getName());
-    	response.setFileext(f.getName().contains(".")?f.getName().split("[.]")[1]:"");
         return response;
     }
     

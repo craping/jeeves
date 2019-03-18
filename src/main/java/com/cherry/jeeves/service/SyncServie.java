@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -38,7 +39,7 @@ import com.cherry.jeeves.enums.StatusNotifyCode;
 import com.cherry.jeeves.utils.WechatUtils;
 
 @Component
-public class SyncServie {
+public class SyncServie implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(SyncServie.class);
     @Autowired
     private CacheService cacheService;
@@ -56,15 +57,39 @@ public class SyncServie {
     @Value("${wechat.url.get_media}")
     private String WECHAT_URL_GET_MEDIA;
     
-    private final static String RED_PACKET_CONTENT = "收到红包，请在手机上查看";
+//    private final static String RED_PACKET_CONTENT = "收到红包，请在手机上查看";
 
+    public static LinkedBlockingQueue<SyncResponse> MSGS = new LinkedBlockingQueue<>();
+    
     @PostConstruct
     public void setMessageHandler() {
         if (messageHandler == null) {
             this.messageHandler = new DefaultMessageHandler();
         }
     }
-
+    
+    @Override
+    public void run() {
+    	SyncResponse syncResponse;
+    	while (true) {
+    		try {
+				syncResponse = MSGS.take();
+				onNewMessage(syncResponse);
+		        //mod包含新增和修改
+		        if (syncResponse.getModContactCount() > 0) {
+		    		onContactsModified(syncResponse.getModContactList());
+		        }
+		        //del->联系人移除
+		        if (syncResponse.getDelContactCount() > 0) {
+		    		onContactsDeleted(syncResponse.getDelContactList());
+		        }
+			} catch (InterruptedException | IOException | URISyntaxException e) {
+				logger.error("msg queue run:", e);
+				e.printStackTrace();
+			}
+		}
+    }
+    
     public void listen() throws IOException, URISyntaxException {
         SyncCheckResponse syncCheckResponse = wechatHttpService.syncCheck();
         if(syncCheckResponse == null)
@@ -78,7 +103,8 @@ public class SyncServie {
         	if (selector == Selector.NORMAL.getCode()) {
             	return;
             } else if (selector == Selector.NEW_MESSAGE.getCode()) {
-                onNewMessage();
+            	sync();
+//                onNewMessage();
             } else {
                 sync();
             }
@@ -95,16 +121,9 @@ public class SyncServie {
         WechatUtils.checkBaseResponse(syncResponse);
         cacheService.setSyncKey(syncResponse.getSyncKey());
         cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
+        MSGS.add(syncResponse);
 //        System.out.println("sync 返回[SyncKey]:"+cacheService.getSyncKey().toString());
 //        System.out.println("sync 返回[SyncCheckKey]:"+cacheService.getSyncCheckKey().toString());
-        //mod包含新增和修改
-        if (syncResponse.getModContactCount() > 0) {
-    		onContactsModified(syncResponse.getModContactList());
-        }
-        //del->联系人移除
-        if (syncResponse.getDelContactCount() > 0) {
-    		onContactsDeleted(syncResponse.getDelContactList());
-        }
         return syncResponse;
     }
 
@@ -128,8 +147,8 @@ public class SyncServie {
         		|| (message.getToUserName() != null && message.getToUserName().startsWith("@@"));
     }
 
-    private void onNewMessage() throws IOException, URISyntaxException {
-        SyncResponse syncResponse = sync();
+    private void onNewMessage(SyncResponse syncResponse) throws IOException, URISyntaxException {
+//        SyncResponse syncResponse = sync();
     	if (messageHandler == null) {
     		return;
     	}

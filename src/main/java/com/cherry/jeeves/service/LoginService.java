@@ -183,6 +183,9 @@ public class LoginService {
 			logger.info("[10] batch get contact completed");
 			syncServie.getMessageHandler().onContactCompleted();
 			
+			//消息队列监听启动
+			new Thread(syncServie).start();
+			
 			cacheService.setAlive(true);
 			logger.info("[*] login process completed");
 			logger.info("[*] start listening");
