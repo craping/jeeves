@@ -184,7 +184,9 @@ public class LoginService {
 			syncServie.getMessageHandler().onContactCompleted();
 			
 			//消息队列监听启动
-			new Thread(syncServie).start();
+			Thread msgThread = new Thread(syncServie);
+			msgThread.setDaemon(true);
+			msgThread.start();
 			
 			cacheService.setAlive(true);
 			logger.info("[*] login process completed");
