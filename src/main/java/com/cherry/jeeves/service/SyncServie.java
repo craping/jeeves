@@ -99,15 +99,11 @@ public class SyncServie {
 //        System.out.println("sync 返回[SyncCheckKey]:"+cacheService.getSyncCheckKey().toString());
         //mod包含新增和修改
         if (syncResponse.getModContactCount() > 0) {
-        	new Thread(() ->{
-        		onContactsModified(syncResponse.getModContactList());
-        	}).start();
+    		onContactsModified(syncResponse.getModContactList());
         }
         //del->联系人移除
         if (syncResponse.getDelContactCount() > 0) {
-        	new Thread(() ->{
-        		onContactsDeleted(syncResponse.getDelContactList());
-        	}).start();
+    		onContactsDeleted(syncResponse.getDelContactList());
         }
         return syncResponse;
     }
@@ -134,222 +130,217 @@ public class SyncServie {
 
     private void onNewMessage() throws IOException, URISyntaxException {
         SyncResponse syncResponse = sync();
-        
-        new Thread(() ->{
-        	
-        	if (messageHandler == null) {
-        		return;
-        	}
-        	for (Message message : syncResponse.getAddMsgList()) {
-        		try {
-	        		//文本消息
-	        		if (message.getMsgType() == MessageType.TEXT.getCode()) {
-	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			//群
-	        			if (isMessageFromChatRoom(message)) {
-	        				messageHandler.onReceivingChatRoomTextMessage(message);
-	        			}
-	        			//个人
-	        			else if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateTextMessage(message);
-	        			}
-	        			
-	        		} 
-	        		//图片
-	        		else if (message.getMsgType() == MessageType.IMAGE.getCode() || message.getAppMsgType() == AppMessageType.IMG.getCode()) {
-	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			String fullImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
-	        			String thumbImageUrl = fullImageUrl + "&type=slave";
-	        			//群
-	        			if (isMessageFromChatRoom(message)) {
-	        				messageHandler.onReceivingChatRoomImageMessage(message, thumbImageUrl, fullImageUrl);
-	        			}
-	        			//个人
-	        			else if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateImageMessage(message, thumbImageUrl, fullImageUrl);
-	        			}
-	        		} 
-	        		//表情
-	        		else if (message.getMsgType() == MessageType.EMOTICON.getCode() || message.getAppMsgType() == AppMessageType.EMOJI.getCode()) {
-	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			String emoticonUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
-	        			emoticonUrl = emoticonUrl + "&type=big";
-	        			//群
-	        			if (isMessageFromChatRoom(message)) {
-	        				messageHandler.onReceivingChatRoomEmoticonMessage(message, emoticonUrl);
-	        			}
-	        			//个人
-	        			else if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateEmoticonMessage(message, emoticonUrl);
-	        			}
-	        		}
-	        		//语音消息
-	        		else if (message.getMsgType() == MessageType.VOICE.getCode()) {
-	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			String voiceUrl = String.format(WECHAT_URL_GET_VOICE, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
-	        			//群
-	        			if (isMessageFromChatRoom(message)) {
-	        				messageHandler.onReceivingChatRoomVoiceMessage(message, voiceUrl);
-	        			}
-	        			//个人
-	        			else if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateVoiceMessage(message, voiceUrl);
-	        			}
-	        		}
-	        		//视频消息
-	        		else if (message.getMsgType() == MessageType.VIDEO.getCode() || message.getMsgType() == MessageType.MICROVIDEO.getCode()) {
-	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			String videoUrl = String.format(WECHAT_URL_GET_VIDEO, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
-	        			String thumbImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey()) + "&type=slave";
-	        			//群
-	        			if (isMessageFromChatRoom(message)) {
-	        				messageHandler.onReceivingChatRoomVideoMessage(message, thumbImageUrl, videoUrl);
-	        			}
-	        			//个人
-	        			else if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateVideoMessage(message, thumbImageUrl, videoUrl);
-	        			}
-	        		}
-	        		//多媒体(文件)消息
-	        		else if (message.getMsgType() == MessageType.APP.getCode()) {
-	        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-	        			String mediaUrl = String.format(WECHAT_URL_GET_MEDIA, cacheService.getFileUrl(), message.getFromUserName(), message.getMediaId(), escape(message.getFileName()), cacheService.getPassTicket());
-	        			//群
-	        			if (isMessageFromChatRoom(message)) {
-	        				messageHandler.onReceivingChatRoomMediaMessage(message, mediaUrl);
-	        			}
-	        			//个人
-	        			else if (isMessageFromIndividual(message)) {
-	        				messageHandler.onReceivingPrivateMediaMessage(message, mediaUrl);
-	        			}
-	        		}
-	        		//好友邀请
-	        		else if (message.getMsgType() == MessageType.VERIFYMSG.getCode() && cacheService.getOwner().getUserName().equals(message.getToUserName())) {
-	        			if (messageHandler.onReceivingFriendInvitation(message.getRecommendInfo())) {
-	        				acceptFriendInvitation(message.getRecommendInfo());
-	        				logger.info("[*] you've accepted the invitation");
-	        				messageHandler.postAcceptFriendInvitation(message);
-	        			} else {
-	        				logger.info("[*] you've declined the invitation");
-	        				//TODO decline invitation
-	        			}
-	        		}
-	        		//状态同步消息
-	        		else if (message.getMsgType() == MessageType.STATUSNOTIFY.getCode()) {
-						// 消息已读
-						if (message.getStatusNotifyCode() == StatusNotifyCode.READED.getCode()) {
-							messageHandler.onStatusNotifyReaded(message);
-						} 
-						// 发起会话
-						else if (message.getStatusNotifyCode() == StatusNotifyCode.ENTER_SESSION.getCode()) {
-							messageHandler.onStatusNotifyEnterSession(message);
-						} 
-						//正在输入
-						else if (message.getStatusNotifyCode() == StatusNotifyCode.INITED.getCode()) {
-							messageHandler.onStatusNotifyInited(message);
-						}
-						// 同步通讯录
-						else if (message.getStatusNotifyCode() == StatusNotifyCode.SYNC_CONV.getCode()) {
-							Set<Contact> chatRooms = Arrays.stream(message.getStatusNotifyUserName().split(","))
-									.filter(x -> x != null && x.startsWith("@@")).map(x -> {
-										Contact contact = new Contact();
-										contact.setUserName(x);
-										return contact;
-									}).collect(Collectors.toSet());
-							
-							long loop = 0;
-							while (true) {
-								ChatRoomDescription[] chatRoomDescriptions = chatRooms.stream()
-									.skip(loop * 50)
-									.limit(50)
-									.map(x -> {
-										ChatRoomDescription description = new ChatRoomDescription();
-										description.setUserName(x.getUserName());
-										return description;
-									}).toArray(ChatRoomDescription[]::new);
-								if (chatRoomDescriptions.length > 0) {
-									BatchGetContactResponse batchGetContactResponse = wechatHttpService
-											.batchGetContact(chatRoomDescriptions);
-									WechatUtils.checkBaseResponse(batchGetContactResponse);
-									logger.info("[*] batchGetContactResponse count = "
-											+ batchGetContactResponse.getCount());
-									batchGetContactResponse.getContactList().forEach(x -> {
-										cacheService.getChatRooms().remove(x);
-										cacheService.getChatRooms().add(x);
-									});
-								} else {
-									break;
-								}
-								loop++;
+    	if (messageHandler == null) {
+    		return;
+    	}
+    	for (Message message : syncResponse.getAddMsgList()) {
+    		try {
+        		//文本消息
+        		if (message.getMsgType() == MessageType.TEXT.getCode()) {
+        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
+        			//群
+        			if (isMessageFromChatRoom(message)) {
+        				messageHandler.onReceivingChatRoomTextMessage(message);
+        			}
+        			//个人
+        			else if (isMessageFromIndividual(message)) {
+        				messageHandler.onReceivingPrivateTextMessage(message);
+        			}
+        			
+        		} 
+        		//图片
+        		else if (message.getMsgType() == MessageType.IMAGE.getCode() || message.getAppMsgType() == AppMessageType.IMG.getCode()) {
+        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
+        			String fullImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
+        			String thumbImageUrl = fullImageUrl + "&type=slave";
+        			//群
+        			if (isMessageFromChatRoom(message)) {
+        				messageHandler.onReceivingChatRoomImageMessage(message, thumbImageUrl, fullImageUrl);
+        			}
+        			//个人
+        			else if (isMessageFromIndividual(message)) {
+        				messageHandler.onReceivingPrivateImageMessage(message, thumbImageUrl, fullImageUrl);
+        			}
+        		} 
+        		//表情
+        		else if (message.getMsgType() == MessageType.EMOTICON.getCode() || message.getAppMsgType() == AppMessageType.EMOJI.getCode()) {
+        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
+        			String emoticonUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
+        			emoticonUrl = emoticonUrl + "&type=big";
+        			//群
+        			if (isMessageFromChatRoom(message)) {
+        				messageHandler.onReceivingChatRoomEmoticonMessage(message, emoticonUrl);
+        			}
+        			//个人
+        			else if (isMessageFromIndividual(message)) {
+        				messageHandler.onReceivingPrivateEmoticonMessage(message, emoticonUrl);
+        			}
+        		}
+        		//语音消息
+        		else if (message.getMsgType() == MessageType.VOICE.getCode()) {
+        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
+        			String voiceUrl = String.format(WECHAT_URL_GET_VOICE, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
+        			//群
+        			if (isMessageFromChatRoom(message)) {
+        				messageHandler.onReceivingChatRoomVoiceMessage(message, voiceUrl);
+        			}
+        			//个人
+        			else if (isMessageFromIndividual(message)) {
+        				messageHandler.onReceivingPrivateVoiceMessage(message, voiceUrl);
+        			}
+        		}
+        		//视频消息
+        		else if (message.getMsgType() == MessageType.VIDEO.getCode() || message.getMsgType() == MessageType.MICROVIDEO.getCode()) {
+        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
+        			String videoUrl = String.format(WECHAT_URL_GET_VIDEO, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
+        			String thumbImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey()) + "&type=slave";
+        			//群
+        			if (isMessageFromChatRoom(message)) {
+        				messageHandler.onReceivingChatRoomVideoMessage(message, thumbImageUrl, videoUrl);
+        			}
+        			//个人
+        			else if (isMessageFromIndividual(message)) {
+        				messageHandler.onReceivingPrivateVideoMessage(message, thumbImageUrl, videoUrl);
+        			}
+        		}
+        		//多媒体(文件)消息
+        		else if (message.getMsgType() == MessageType.APP.getCode()) {
+        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
+        			String mediaUrl = String.format(WECHAT_URL_GET_MEDIA, cacheService.getFileUrl(), message.getFromUserName(), message.getMediaId(), escape(message.getFileName()), cacheService.getPassTicket());
+        			//群
+        			if (isMessageFromChatRoom(message)) {
+        				messageHandler.onReceivingChatRoomMediaMessage(message, mediaUrl);
+        			}
+        			//个人
+        			else if (isMessageFromIndividual(message)) {
+        				messageHandler.onReceivingPrivateMediaMessage(message, mediaUrl);
+        			}
+        		}
+        		//好友邀请
+        		else if (message.getMsgType() == MessageType.VERIFYMSG.getCode() && cacheService.getOwner().getUserName().equals(message.getToUserName())) {
+        			if (messageHandler.onReceivingFriendInvitation(message.getRecommendInfo())) {
+        				acceptFriendInvitation(message.getRecommendInfo());
+        				logger.info("[*] you've accepted the invitation");
+        				messageHandler.postAcceptFriendInvitation(message);
+        			} else {
+        				logger.info("[*] you've declined the invitation");
+        				//TODO decline invitation
+        			}
+        		}
+        		//状态同步消息
+        		else if (message.getMsgType() == MessageType.STATUSNOTIFY.getCode()) {
+					// 消息已读
+					if (message.getStatusNotifyCode() == StatusNotifyCode.READED.getCode()) {
+						messageHandler.onStatusNotifyReaded(message);
+					} 
+					// 发起会话
+					else if (message.getStatusNotifyCode() == StatusNotifyCode.ENTER_SESSION.getCode()) {
+						messageHandler.onStatusNotifyEnterSession(message);
+					} 
+					//正在输入
+					else if (message.getStatusNotifyCode() == StatusNotifyCode.INITED.getCode()) {
+						messageHandler.onStatusNotifyInited(message);
+					}
+					// 同步通讯录
+					else if (message.getStatusNotifyCode() == StatusNotifyCode.SYNC_CONV.getCode()) {
+						Set<Contact> chatRooms = Arrays.stream(message.getStatusNotifyUserName().split(","))
+								.filter(x -> x != null && x.startsWith("@@")).map(x -> {
+									Contact contact = new Contact();
+									contact.setUserName(x);
+									return contact;
+								}).collect(Collectors.toSet());
+						
+						while (true) {
+							ChatRoomDescription[] chatRoomDescriptions = chatRooms.stream()
+								.filter(x -> x.getEncryChatRoomId() == null || x.getEncryChatRoomId().isEmpty())
+								.limit(50)
+								.map(x -> {
+									ChatRoomDescription description = new ChatRoomDescription();
+									description.setUserName(x.getUserName());
+									return description;
+								}).toArray(ChatRoomDescription[]::new);
+							if (chatRoomDescriptions.length > 0) {
+								BatchGetContactResponse batchGetContactResponse = wechatHttpService
+										.batchGetContact(chatRoomDescriptions);
+								WechatUtils.checkBaseResponse(batchGetContactResponse);
+								logger.info("[*] batchGetContactResponse count = "
+										+ batchGetContactResponse.getCount());
+								batchGetContactResponse.getContactList().forEach(x -> {
+									chatRooms.remove(x);
+									cacheService.getChatRooms().remove(x);
+									cacheService.getChatRooms().add(x);
+								});
+							} else {
+								break;
 							}
-							messageHandler.onStatusNotifySyncConv(message);
-						} 
-						//关闭会话
-						else if (message.getStatusNotifyCode() == StatusNotifyCode.QUIT_SESSION.getCode()) {
-							messageHandler.onStatusNotifyQuitSession(message);
 						}
-	        		}
-	        		//系统消息
-	        		else if (message.getMsgType() == MessageType.SYS.getCode()) {
-	        			//红包
-	        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
-	        				logger.info("[*] you've received a red packet");
-	        				String from = message.getFromUserName();
-	        				ConcurrentLinkedQueue<Contact> contacts = null;
-	        				//群
-	        				if (isMessageFromChatRoom(message)) {
-	        					contacts = cacheService.getChatRooms();
-	        				}
-	        				//个人
-	        				else if (isMessageFromIndividual(message)) {
-	        					contacts = cacheService.getIndividuals();
-	        				}
-	        				if (contacts != null) {
-	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
-	        					messageHandler.onRedPacketReceived(contact);
-	        				}
-						}
-	        			//被对方删除
-	        			else if(message.getContent() != null && message.getContent().contains("开启了朋友验证")){
-	        				String from = message.getFromUserName();
-	        				ConcurrentLinkedQueue<Contact> contacts = null;
-	        				//群
-	        				if (isMessageFromChatRoom(message)) {
-	        					contacts = cacheService.getChatRooms();
-	        				}
-	        				//个人
-	        				else if (isMessageFromIndividual(message)) {
-	        					contacts = cacheService.getIndividuals();
-	        				}
-	        				if (contacts != null) {
-	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
-	        					messageHandler.onFriendVerify(contact);
-	        				}
-						}
-	        			//被对方拉黑
-	        			else if(message.getContent() != null && message.getContent().contains("但被对方拒收了")){
-	        				String from = message.getFromUserName();
-	        				ConcurrentLinkedQueue<Contact> contacts = null;
-	        				//群
-	        				if (isMessageFromChatRoom(message)) {
-	        					contacts = cacheService.getChatRooms();
-	        				}
-	        				//个人
-	        				else if (isMessageFromIndividual(message)) {
-	        					contacts = cacheService.getIndividuals();
-	        				}
-	        				if (contacts != null) {
-	        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
-	        					messageHandler.onFriendBlacklist(contact);
-	        				}
-						}
-	        		}
-        		} catch (Exception e) {
-        			logger.error("handler exception", e);
-				}
-        		
-        	}
-        }).start();
+						messageHandler.onStatusNotifySyncConv(message);
+					} 
+					//关闭会话
+					else if (message.getStatusNotifyCode() == StatusNotifyCode.QUIT_SESSION.getCode()) {
+						messageHandler.onStatusNotifyQuitSession(message);
+					}
+        		}
+        		//系统消息
+        		else if (message.getMsgType() == MessageType.SYS.getCode()) {
+        			//红包
+        			if (message.getAppMsgType() == AppMessageType.RED_ENVELOPES.getCode()) {
+        				logger.info("[*] you've received a red packet");
+        				String from = message.getFromUserName();
+        				ConcurrentLinkedQueue<Contact> contacts = null;
+        				//群
+        				if (isMessageFromChatRoom(message)) {
+        					contacts = cacheService.getChatRooms();
+        				}
+        				//个人
+        				else if (isMessageFromIndividual(message)) {
+        					contacts = cacheService.getIndividuals();
+        				}
+        				if (contacts != null) {
+        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
+        					messageHandler.onRedPacketReceived(contact);
+        				}
+					}
+        			//被对方删除
+        			else if(message.getContent() != null && message.getContent().contains("开启了朋友验证")){
+        				String from = message.getFromUserName();
+        				ConcurrentLinkedQueue<Contact> contacts = null;
+        				//群
+        				if (isMessageFromChatRoom(message)) {
+        					contacts = cacheService.getChatRooms();
+        				}
+        				//个人
+        				else if (isMessageFromIndividual(message)) {
+        					contacts = cacheService.getIndividuals();
+        				}
+        				if (contacts != null) {
+        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
+        					messageHandler.onFriendVerify(contact);
+        				}
+					}
+        			//被对方拉黑
+        			else if(message.getContent() != null && message.getContent().contains("但被对方拒收了")){
+        				String from = message.getFromUserName();
+        				ConcurrentLinkedQueue<Contact> contacts = null;
+        				//群
+        				if (isMessageFromChatRoom(message)) {
+        					contacts = cacheService.getChatRooms();
+        				}
+        				//个人
+        				else if (isMessageFromIndividual(message)) {
+        					contacts = cacheService.getIndividuals();
+        				}
+        				if (contacts != null) {
+        					Contact contact = contacts.stream().filter(x -> Objects.equals(x.getUserName(), from)).findAny().orElse(null);
+        					messageHandler.onFriendBlacklist(contact);
+        				}
+					}
+        		}
+    		} catch (Exception e) {
+    			logger.error("handler exception", e);
+			}
+    		
+    	}
     }
 
     private void onContactsModified(Set<Contact> contacts) {
@@ -392,10 +383,22 @@ public class SyncServie {
             Set<Contact> newChatRooms = new HashSet<>();
             Set<Contact> modifiedChatRooms = new HashSet<>();
             
-            long loop = 0;
+            chatRooms.forEach(x -> {
+            	Contact existChatRoom = existingChatRooms.stream().filter(c -> c.equals(x)).findFirst().orElse(null);
+            	if(existChatRoom != null){
+            		//更新seq唯一值
+					if(!x.getSeq().equals(existChatRoom.getSeq()))
+						seqMap.put(existChatRoom.getSeq(), x.getSeq());
+					modifiedChatRooms.add(x);
+            	}else{
+            		 newChatRooms.add(x);
+            	}
+            });
+            
+            //获取新群EncryChatRoomId
 			while (true) {
-				ChatRoomDescription[] chatRoomDescriptions = chatRooms.stream()
-					.skip(loop * 50)
+				ChatRoomDescription[] chatRoomDescriptions = newChatRooms.stream()
+					.filter(x -> x.getEncryChatRoomId() == null || x.getEncryChatRoomId().isEmpty())
 					.limit(50)
 					.map(x -> {
 						ChatRoomDescription description = new ChatRoomDescription();
@@ -408,78 +411,64 @@ public class SyncServie {
 					WechatUtils.checkBaseResponse(batchGetContactResponse);
 					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
 					batchGetContactResponse.getContactList().forEach(x -> {
-		            	if (existingChatRooms.contains(x)) {
-		            		//更新seq唯一值
-			            	for (Contact c : existingChatRooms) {
-								if(x.equals(c) && !x.getSeq().equals(c.getSeq())){
-									seqMap.put(c.getSeq(), x.getSeq());
-									break;
-								}
-							}
-		                    modifiedChatRooms.add(x);
-		                } else {
-		                    newChatRooms.add(x);
-		                }
+						newChatRooms.remove(x);
+						newChatRooms.add(x);
+						existingChatRooms.add(x);
 					});
 				} else {
 					break;
 				}
-				loop++;
 			}
 			
-//            for (Contact chatRoom : chatRooms) {
-//                if (existingChatRooms.contains(chatRoom)) {
-//                    modifiedChatRooms.add(chatRoom);
-//                } else {
-//                    newChatRooms.add(chatRoom);
-//                }
-//            }
-            existingChatRooms.addAll(newChatRooms);
             if (messageHandler != null && newChatRooms.size() > 0) {
                 messageHandler.onNewChatRoomsFound(newChatRooms);
             }
+            
             for (Contact chatRoom : modifiedChatRooms) {
                 Contact existingChatRoom = existingChatRooms.stream().filter(x -> x.getUserName().equals(chatRoom.getUserName())).findFirst().orElse(null);
                 if (existingChatRoom == null) {
                     continue;
                 }
-                existingChatRooms.remove(existingChatRoom);
-                existingChatRooms.add(chatRoom);
+                //获取变动消息中的群主信息
+                existingChatRoom.setChatRoomOwner(chatRoom.getChatRoomOwner());
+                
+                ConcurrentLinkedQueue<Contact> oldMembers = existingChatRoom.getMemberList();
+                ConcurrentLinkedQueue<Contact> newMembers = chatRoom.getMemberList();
+                Set<Contact> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
+                Set<Contact> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
+                oldMembers.removeAll(left);
+                
+                //获取新加入成员头像信息
+                if(joined.size() > 0){
+                	while (true) {
+                		ChatRoomDescription[] chatRoomDescriptions = joined.stream().filter(x -> x.getHeadImgUrl() == null || x.getHeadImgUrl().isEmpty())
+            				.limit(50)
+            				.map(x -> {
+            					ChatRoomDescription description = new ChatRoomDescription();
+            					description.setEncryChatRoomId(chatRoom.getEncryChatRoomId());
+            					description.setUserName(x.getUserName());
+            					return description;
+            				}).toArray(ChatRoomDescription[]::new);
+                		if (chatRoomDescriptions.length > 0) {
+                			BatchGetContactResponse batchGetContactResponse = wechatHttpService.batchGetContact(chatRoomDescriptions);
+                			WechatUtils.checkBaseResponse(batchGetContactResponse);
+                			logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
+                			batchGetContactResponse.getContactList().forEach(x -> {
+//            						chatRoom.getMemberList().remove(x);
+//            						chatRoom.getMemberList().add(x);
+                				joined.remove(x);
+                				joined.add(x);
+                				oldMembers.add(x);
+                			});
+                		} else {
+                			break;
+                		}
+                	}
+                }
+                
                 if (messageHandler != null) {
-                	ConcurrentLinkedQueue<Contact> oldMembers = existingChatRoom.getMemberList();
-                	ConcurrentLinkedQueue<Contact> newMembers = chatRoom.getMemberList();
-                    Set<Contact> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
-                    Set<Contact> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
                     if (joined.size() > 0 || left.size() > 0) {
                         messageHandler.onChatRoomMembersChanged(chatRoom, joined, left);
-                    }
-                    //获取新加入成员头像信息
-                    if(joined.size() > 0){
-                    	loop = 0;
-            			while (true) {
-            				ChatRoomDescription[] chatRoomDescriptions = joined.stream()
-            					.skip(loop * 50)
-            					.limit(50)
-            					.map(x -> {
-            						ChatRoomDescription description = new ChatRoomDescription();
-            						description.setEncryChatRoomId(chatRoom.getEncryChatRoomId());
-            						description.setUserName(x.getUserName());
-            						return description;
-            					}).toArray(ChatRoomDescription[]::new);
-            				if (chatRoomDescriptions.length > 0) {
-            					BatchGetContactResponse batchGetContactResponse = wechatHttpService
-            							.batchGetContact(chatRoomDescriptions);
-            					WechatUtils.checkBaseResponse(batchGetContactResponse);
-            					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
-            					batchGetContactResponse.getContactList().forEach(x -> {
-            						chatRoom.getMemberList().remove(x);
-            						chatRoom.getMemberList().add(x);
-            					});
-            				} else {
-            					break;
-            				}
-            				loop++;
-            			}
                     }
                 }
             }

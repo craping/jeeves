@@ -196,6 +196,61 @@ public class WechatHttpService {
 		}
         return chatRoom;
     }
+    
+    
+    public Contact getChatRoomMemberInfo(String chatRoomId, String memberId) {
+    	Contact chatRoom = null;
+    	for (Contact c : cacheService.getChatRooms()) {
+			if(c.getUserName().equals(chatRoomId)){
+				chatRoom = c;
+				break;
+			}
+		}
+    	if(chatRoom == null)
+    		return null;
+    	
+    	String encryChatRoomId = chatRoom.getEncryChatRoomId();
+    	
+    	if(encryChatRoomId == null || encryChatRoomId.isEmpty()){
+    		ChatRoomDescription description = new ChatRoomDescription();
+			description.setUserName(chatRoom.getUserName());
+    		ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
+    		BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
+    		for (Contact c : response.getContactList()) {
+    			if(!chatRoom.getSeq().equals(c.getSeq())){
+    				Map<String, String> seqMap = new HashMap<>();
+					seqMap.put(chatRoom.getSeq(), c.getSeq());
+					if (messageHandler != null) {
+			            messageHandler.onMembersSeqChanged(seqMap);
+			        }
+				}
+    			cacheService.getChatRooms().remove(c);
+    			cacheService.getChatRooms().add(c);
+    			chatRoom = c;
+			}
+    	}
+    	
+		while (true) {
+			ChatRoomDescription[] descriptions = chatRoom.getMemberList().stream().filter(m -> m.getUserName().equals(memberId))
+				.map(x -> {
+					ChatRoomDescription description = new ChatRoomDescription();
+					description.setEncryChatRoomId(encryChatRoomId);
+					description.setUserName(x.getUserName());
+					return description;
+				}).toArray(ChatRoomDescription[]::new);
+			if (descriptions.length > 0) {
+				BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
+				for (Contact c : response.getContactList()) {
+					chatRoom.getMemberList().remove(c);
+					chatRoom.getMemberList().add(c);
+					return c;
+				}
+			} else {
+				break;
+			}
+		}
+        return null;
+    }
 
     /**
      * Create a chatroom with a topic.

@@ -14,6 +14,8 @@ public class Contact extends Member {
     @JsonProperty
     private int OwnerUin;
     @JsonProperty
+    private String ChatRoomOwner;
+    @JsonProperty
     private long Statues;
     @JsonProperty
     private long AttrStatus;
@@ -147,8 +149,16 @@ public class Contact extends Member {
     public void setOwnerUin(int ownerUin) {
         OwnerUin = ownerUin;
     }
+    
+    public String getChatRoomOwner() {
+		return ChatRoomOwner;
+	}
 
-    @Override
+	public void setChatRoomOwner(String chatRoomOwner) {
+		ChatRoomOwner = chatRoomOwner;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
