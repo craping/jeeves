@@ -24,10 +24,12 @@ import org.springframework.web.client.RestTemplate;
  */
 public class StatefullRestTemplate extends RestTemplate {
     private final HttpContext httpContext;
-
+    
+    private HttpClient httpClient;
+    
     StatefullRestTemplate(HttpContext httpContext) {
         super();
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        httpClient = HttpClientBuilder.create().build();
         this.httpContext = httpContext == null ? new BasicHttpContext() : httpContext;
         StatefullHttpComponentsClientHttpRequestFactory statefullHttpComponentsClientHttpRequestFactory = new StatefullHttpComponentsClientHttpRequestFactory(httpClient, httpContext);
         statefullHttpComponentsClientHttpRequestFactory.setConnectTimeout(35000);
@@ -54,8 +56,14 @@ public class StatefullRestTemplate extends RestTemplate {
     public HttpContext getHttpContext() {
         return httpContext;
     }
+    
+    public HttpClient getHttpClient() {
+		return httpClient;
+	}
 
-    class StatefullHttpComponentsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
+
+
+	class StatefullHttpComponentsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
         private final HttpContext httpContext;
 
         StatefullHttpComponentsClientHttpRequestFactory(HttpClient httpClient, HttpContext httpContext) {

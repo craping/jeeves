@@ -23,24 +23,28 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.Consts;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.cherry.jeeves.domain.request.AddChatRoomMemberRequest;
@@ -608,54 +612,62 @@ class WechatHttpServiceInternal {
         int mediaLength = mediaData.length;
 		// 分片数量
 		int chunks = new BigDecimal(mediaLength).divide(new BigDecimal(UPLOAD_MEDIA_FILE_CHUNK_SIZE), 0, BigDecimal.ROUND_UP).intValue();
-		UploadMediaResponse response = null;
+		fileId++;
+		String lastModifieDate = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT 0800 (中国标准时间)'", Locale.US).format(new Timestamp(f.lastModified()));
+		final long rnd = System.currentTimeMillis() * 10;
+		final String url = String.format(WECHAT_URL_UPLOAD_MEDIA, cacheService.getFileUrl());
+		
+		UploadMediaRequest uploadmediarequest = new UploadMediaRequest();
+        uploadmediarequest.setBaseRequest(cacheService.getBaseRequest());
+        uploadmediarequest.setFromUserName(cacheService.getOwner().getUserName());
+        uploadmediarequest.setToUserName(toUserName);
+        uploadmediarequest.setClientMediaId(rnd);
+        uploadmediarequest.setFileMd5(DigestUtils.md5Hex(new FileInputStream(f)));
+        uploadmediarequest.setDataLen(f.length());
+        uploadmediarequest.setTotalLen(f.length());
+        uploadmediarequest.setMediaType(4);
+        uploadmediarequest.setUploadType(2);
+        String requestJson = jsonMapper.writeValueAsString(uploadmediarequest);
+		
+		HttpPost httpPost = new HttpPost(url);
+		UploadMediaResponse mediaResponse = null;
 		for (int chunk = 0; chunk < chunks; chunk++) {
 			int from = chunk * UPLOAD_MEDIA_FILE_CHUNK_SIZE;
 			int to = (chunk + 1) * UPLOAD_MEDIA_FILE_CHUNK_SIZE;
 			to = Math.min(to, mediaLength);
 			byte[] temp = Arrays.copyOfRange(mediaData, from, to);
-            
-	//		FileSystemResource resource = new FileSystemResource(f);
-			
-			final long rnd = System.currentTimeMillis() * 10;
-	        final String url = String.format(WECHAT_URL_UPLOAD_MEDIA, cacheService.getFileUrl());
-	        UploadMediaRequest uploadmediarequest = new UploadMediaRequest();
-	        uploadmediarequest.setBaseRequest(cacheService.getBaseRequest());
-	        uploadmediarequest.setFromUserName(cacheService.getOwner().getUserName());
-	        uploadmediarequest.setToUserName(toUserName);
-	        uploadmediarequest.setClientMediaId(rnd);
-	        uploadmediarequest.setFileMd5(DigestUtils.md5Hex(new FileInputStream(f)));
-	        uploadmediarequest.setDataLen(f.length());
-	        uploadmediarequest.setTotalLen(f.length());
-	        uploadmediarequest.setMediaType(4);
-	        uploadmediarequest.setUploadType(2);
 	        
-	        
-	        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-	        form.add("id", "WU_FILE_"+(fileId++));
-	        form.add("chunks", chunks);
-	        form.add("chunk", chunk);
-	        form.add("name", f.getName());
-	        form.add("type", mimeType);
-	        form.add("lastModifieDate", new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT 0800 (中国标准时间)'", Locale.US).format(new Timestamp(f.lastModified())));
-	        form.add("size", f.length());
-	        form.add("mediatype", mediaType);
-	        form.add("uploadmediarequest", jsonMapper.writeValueAsString(uploadmediarequest) );
-	        form.add("webwx_data_ticket", cookies.get("webwx_data_ticket"));
-	        form.add("pass_ticket", cacheService.getPassTicket());
-	        form.add("filename", new ByteArrayResource(temp, "form-data; filename=\"" + f.getName() + "\""));
-	        
-	        HttpHeaders customHeader = createPostCustomHeader();
-	        HeaderUtils.assign(customHeader, postHeader);
-	        customHeader.setContentType(MediaType.MULTIPART_FORM_DATA);
-	        ResponseEntity<String> responseEntity
-	                = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(form, customHeader), String.class);
-	        response = jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), UploadMediaResponse.class);
-	        response.setTitle(f.getName());
-	    	response.setFileext(f.getName().contains(".")?f.getName().split("[.]")[1]:"");
+	        org.apache.http.HttpEntity requestEntity = MultipartEntityBuilder.create()
+	        .addTextBody("id", "WU_FILE_"+fileId)
+	        .addTextBody("chunks", String.valueOf(chunks))
+            .addTextBody("chunk", String.valueOf(chunk))
+            .addTextBody("name", f.getName())
+            .addTextBody("type", mimeType)
+            .addTextBody("lastModifieDate", lastModifieDate)
+            .addTextBody("size", String.valueOf(f.length()))
+            .addTextBody("mediatype", mediaType)
+            .addTextBody("uploadmediarequest", requestJson)
+            .addTextBody("webwx_data_ticket", cookies.get("webwx_data_ticket"))
+            .addTextBody("pass_ticket", cacheService.getPassTicket())
+            .addBinaryBody("filename", temp, ContentType.parse(mimeType), f.getName())
+            .build();
+	        httpPost.setEntity(requestEntity);
+	        HttpContext context = ((StatefullRestTemplate) restTemplate).getHttpContext();
+	        CloseableHttpClient client = (CloseableHttpClient) ((StatefullRestTemplate) restTemplate).getHttpClient();
+	        org.apache.http.HttpResponse response = client.execute(httpPost, context);
+	        int statusCode = response.getStatusLine().getStatusCode();
+            if (HttpStatus.SC_OK != statusCode) {
+                throw new RuntimeException("响应失败(" + statusCode + ")");
+            }
+
+            org.apache.http.HttpEntity responseEntity = response.getEntity();
+            String res = EntityUtils.toString(responseEntity, Consts.UTF_8);
+            mediaResponse = jsonMapper.readValue(res, UploadMediaResponse.class);
+            mediaResponse.setTitle(f.getName());
+	    	mediaResponse.setFileext(f.getName().contains(".")?f.getName().split("[.]")[1]:"");
         }
         
-        return response;
+        return mediaResponse;
     }
     
     SendMsgResponse sendText(String toUserName, String content) throws IOException {
