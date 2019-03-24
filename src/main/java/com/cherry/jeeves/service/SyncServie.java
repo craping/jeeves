@@ -65,8 +65,6 @@ public class SyncServie implements Runnable {
     private String WECHAT_URL_GET_MEDIA;
     
 //    private final static String RED_PACKET_CONTENT = "收到红包，请在手机上查看";
-
-    public static LinkedBlockingQueue<SyncResponse> MSGS = new LinkedBlockingQueue<>();
     
 	//Disruptor环形数组队列大小
 	private static final int BUFFER_SIZE = 1024 * 1024;
@@ -92,24 +90,6 @@ public class SyncServie implements Runnable {
 			event.clear();
 		});
     	DISRUPTOR.start();
-//    	SyncResponse syncResponse;
-//    	while (true) {
-//    		try {
-//				syncResponse = MSGS.take();
-//		        //mod包含新增和修改
-//		        if (syncResponse.getModContactCount() > 0) {
-//		    		onContactsModified(syncResponse.getModContactList());
-//		        }
-//		        //del->联系人移除
-//		        if (syncResponse.getDelContactCount() > 0) {
-//		    		onContactsDeleted(syncResponse.getDelContactList());
-//		        }
-//		        onNewMessage(syncResponse);
-//			} catch (InterruptedException | IOException | URISyntaxException e) {
-//				logger.error("msg queue run:", e);
-//				e.printStackTrace();
-//			}
-//		}
     }
     
     public void listen() throws IOException, URISyntaxException {
@@ -143,7 +123,6 @@ public class SyncServie implements Runnable {
 		WechatUtils.checkBaseResponse(syncResponse);
 		cacheService.setSyncKey(syncResponse.getSyncKey());
 		cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
-//        MSGS.add(syncResponse);
 		
 		if (syncResponse.getModContactCount() > 0) {
 
