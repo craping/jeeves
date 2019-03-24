@@ -243,7 +243,7 @@ public interface MessageHandler {
      * @param membersLeft   离开的群成员
      */
     void onChatRoomMembersChanged(Contact chatRoom, Set<Contact> membersJoined, Set<Contact> membersLeft);
-
+    
     /**
      * 事件：发现新增群（例如加入了新群）
      *
@@ -251,6 +251,13 @@ public interface MessageHandler {
      */
     void onNewChatRoomsFound(Set<Contact> chatRooms);
 
+    /**
+     * 事件：群信息变动（例如群名称改变）
+     *
+     * @param chatRooms 新增的群
+     */
+    void onChatRoomsModify(Set<Contact> chatRooms);
+    
     /**
      * 事件：发现群减少（例如被踢出了群）
      *
@@ -265,6 +272,13 @@ public interface MessageHandler {
      */
     void onNewFriendsFound(Set<Contact> contacts);
 
+    /**
+     * 事件：好友信息变动
+     *
+     * @param contacts 新的好友
+     */
+    void onFriendsModify(Set<Contact> contacts);
+    
     /**
      * 事件：发现好友减少
      *

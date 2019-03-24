@@ -144,13 +144,7 @@ public class WechatHttpService {
      * @throws IOException if batchGetContact fails
      */
     public Contact getChatRoomInfo(String chatRoomId) throws IOException {
-    	Contact chatRoom = null;
-    	for (Contact c : cacheService.getChatRooms()) {
-			if(c.getUserName().equals(chatRoomId)){
-				chatRoom = c;
-				break;
-			}
-		}
+    	final Contact chatRoom = cacheService.getChatRoom(chatRoomId);
     	if(chatRoom == null)
     		return null;
     	
@@ -162,16 +156,15 @@ public class WechatHttpService {
     		ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
     		BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
     		for (Contact c : response.getContactList()) {
-    			if(!chatRoom.getSeq().equals(c.getSeq())){
+    			if(chatRoom.getSeq() != null && !chatRoom.getSeq().equals("0") && !chatRoom.getSeq().equals(c.getSeq())){
     				Map<String, String> seqMap = new HashMap<>();
 					seqMap.put(chatRoom.getSeq(), c.getSeq());
+					chatRoom.setHeadImgUrl(c.getHeadImgUrl());
 					if (messageHandler != null) {
 			            messageHandler.onMembersSeqChanged(seqMap);
 			        }
 				}
-    			cacheService.getChatRooms().remove(c);
-    			cacheService.getChatRooms().add(c);
-    			chatRoom = c;
+    			chatRoom.setEncryChatRoomId(c.getEncryChatRoomId());
 			}
     	}
     	
@@ -186,10 +179,12 @@ public class WechatHttpService {
 				}).toArray(ChatRoomDescription[]::new);
 			if (descriptions.length > 0) {
 				BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
-				for (Contact c : response.getContactList()) {
+				if(response == null || response.getCount() == 0 || response.getContactList().stream().filter(m -> m.getHeadImgUrl() == null || m.getHeadImgUrl().isEmpty()).count() > 0)
+					break;
+				response.getContactList().forEach(c -> {
 					chatRoom.getMemberList().remove(c);
 					chatRoom.getMemberList().add(c);
-				}
+				});
 			} else {
 				break;
 			}
@@ -199,13 +194,7 @@ public class WechatHttpService {
     
     
     public Contact getChatRoomMemberInfo(String chatRoomId, String memberId) {
-    	Contact chatRoom = null;
-    	for (Contact c : cacheService.getChatRooms()) {
-			if(c.getUserName().equals(chatRoomId)){
-				chatRoom = c;
-				break;
-			}
-		}
+    	final Contact chatRoom = cacheService.getChatRoom(chatRoomId);
     	if(chatRoom == null)
     		return null;
     	
@@ -217,16 +206,15 @@ public class WechatHttpService {
     		ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
     		BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
     		for (Contact c : response.getContactList()) {
-    			if(!chatRoom.getSeq().equals(c.getSeq())){
+    			if(chatRoom.getSeq() != null && !chatRoom.getSeq().equals("0") && !chatRoom.getSeq().equals(c.getSeq())){
     				Map<String, String> seqMap = new HashMap<>();
 					seqMap.put(chatRoom.getSeq(), c.getSeq());
+					chatRoom.setHeadImgUrl(c.getHeadImgUrl());
 					if (messageHandler != null) {
 			            messageHandler.onMembersSeqChanged(seqMap);
 			        }
 				}
-    			cacheService.getChatRooms().remove(c);
-    			cacheService.getChatRooms().add(c);
-    			chatRoom = c;
+    			chatRoom.setEncryChatRoomId(c.getEncryChatRoomId());
 			}
     	}
     	
@@ -240,6 +228,8 @@ public class WechatHttpService {
 				}).toArray(ChatRoomDescription[]::new);
 			if (descriptions.length > 0) {
 				BatchGetContactResponse response = wechatHttpServiceInternal.batchGetContact(descriptions);
+				if(response == null || response.getCount() == 0 || response.getContactList().stream().filter(m -> m.getHeadImgUrl() == null || m.getHeadImgUrl().isEmpty()).count() > 0)
+					break;
 				for (Contact c : response.getContactList()) {
 					chatRoom.getMemberList().remove(c);
 					chatRoom.getMemberList().add(c);

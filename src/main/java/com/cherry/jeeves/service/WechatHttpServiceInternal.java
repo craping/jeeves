@@ -546,24 +546,35 @@ class WechatHttpServiceInternal {
      * @return new messages and contacts
      * @throws IOException if the http response body can't be convert to {@link SyncResponse}
      */
-    SyncResponse sync() throws IOException {
+    SyncResponse sync(SyncRequest request) {
     	BaseRequest baseRequest = cacheService.getBaseRequest();
 //    	if(cacheService.getSyncKey() != null && cacheService.getSyncCheckKey() != null) {
 //	    	System.out.println("sync 请求[SyncKey]:"+cacheService.getSyncKey().toString());
 //	        System.out.println("sync 请求[SyncCheckKey]:"+cacheService.getSyncCheckKey().toString());
 //    	}
-        final String url = String.format(WECHAT_URL_SYNC, cacheService.getHostUrl(), baseRequest.getSid(), escape(baseRequest.getSkey()), cacheService.getPassTicket());
-        SyncRequest request = new SyncRequest();
-        request.setBaseRequest(baseRequest);
-        request.setRr(-System.currentTimeMillis() / 1000);
-        request.setSyncKey(cacheService.getSyncKey());
-        HttpHeaders customHeader = createPostCustomHeader();
-        HeaderUtils.assign(customHeader, postHeader);
-        CookieStore store = (CookieStore) ((StatefullRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
-        cookies = store.getCookies().stream().collect(Collectors.toMap(Cookie::getName, Cookie::getValue, (k1, k2)-> k2));
-        ResponseEntity<String> responseEntity
-                = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
-        return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), SyncResponse.class);
+		try {
+			String url = String.format(WECHAT_URL_SYNC, cacheService.getHostUrl(), baseRequest.getSid(), escape(baseRequest.getSkey()), cacheService.getPassTicket());
+			if(request == null){
+				request = new SyncRequest();
+		        request.setBaseRequest(baseRequest);
+		        request.setRr(-System.currentTimeMillis() / 1000);
+		        request.setSyncKey(cacheService.getSyncKey());
+			}
+	        HttpHeaders customHeader = createPostCustomHeader();
+	        HeaderUtils.assign(customHeader, postHeader);
+	        CookieStore store = (CookieStore) ((StatefullRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
+	        cookies = store.getCookies().stream().collect(Collectors.toMap(Cookie::getName, Cookie::getValue, (k1, k2)-> k2));
+	        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
+	        SyncResponse response = jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), SyncResponse.class);
+	        if(response == null){
+				 System.out.println("获取消息为空，重新获取"+response);
+				 return sync(request);
+			 }
+	        return response;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return sync(request);
+		}
     }
 
     VerifyUserResponse acceptFriend(VerifyUser[] verifyUsers) throws IOException, URISyntaxException {

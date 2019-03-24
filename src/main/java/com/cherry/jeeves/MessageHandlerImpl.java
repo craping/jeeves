@@ -356,4 +356,16 @@ public class MessageHandlerImpl implements MessageHandler {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onChatRoomsModify(Set<Contact> chatRooms) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFriendsModify(Set<Contact> contacts) {
+		// TODO Auto-generated method stub
+		
+	}
 }

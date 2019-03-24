@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,7 +37,13 @@ import com.cherry.jeeves.enums.MessageType;
 import com.cherry.jeeves.enums.RetCode;
 import com.cherry.jeeves.enums.Selector;
 import com.cherry.jeeves.enums.StatusNotifyCode;
+import com.cherry.jeeves.service.disruptor.MsgEvent;
+import com.cherry.jeeves.service.disruptor.MsgHandler;
 import com.cherry.jeeves.utils.WechatUtils;
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
+import com.lmax.disruptor.util.DaemonThreadFactory;
 
 @Component
 public class SyncServie implements Runnable {
@@ -61,6 +68,13 @@ public class SyncServie implements Runnable {
 
     public static LinkedBlockingQueue<SyncResponse> MSGS = new LinkedBlockingQueue<>();
     
+	//Disruptor环形数组队列大小
+	private static final int BUFFER_SIZE = 1024 * 1024;
+	
+	private static final Map<Integer, MsgEvent> EVENTS = new HashMap<>();
+	
+	public static final Disruptor<MsgEvent> DISRUPTOR = new Disruptor<>(MsgEvent::new, BUFFER_SIZE, DaemonThreadFactory.INSTANCE, ProducerType.SINGLE, new BlockingWaitStrategy());
+    
     @PostConstruct
     public void setMessageHandler() {
         if (messageHandler == null) {
@@ -70,24 +84,32 @@ public class SyncServie implements Runnable {
     
     @Override
     public void run() {
-    	SyncResponse syncResponse;
-    	while (true) {
-    		try {
-				syncResponse = MSGS.take();
-				onNewMessage(syncResponse);
-		        //mod包含新增和修改
-		        if (syncResponse.getModContactCount() > 0) {
-		    		onContactsModified(syncResponse.getModContactList());
-		        }
-		        //del->联系人移除
-		        if (syncResponse.getDelContactCount() > 0) {
-		    		onContactsDeleted(syncResponse.getDelContactList());
-		        }
-			} catch (InterruptedException | IOException | URISyntaxException e) {
-				logger.error("msg queue run:", e);
-				e.printStackTrace();
-			}
+    	MsgHandler[] handlers = new MsgHandler[10];
+    	for (int i = 0; i < handlers.length; i++) {
+    		handlers[i] = new MsgHandler(i+1, handlers.length, this);
 		}
+    	DISRUPTOR.handleEventsWith(handlers).then((event, sequence, endOfBatch) -> {
+			event.clear();
+		});
+    	DISRUPTOR.start();
+//    	SyncResponse syncResponse;
+//    	while (true) {
+//    		try {
+//				syncResponse = MSGS.take();
+//		        //mod包含新增和修改
+//		        if (syncResponse.getModContactCount() > 0) {
+//		    		onContactsModified(syncResponse.getModContactList());
+//		        }
+//		        //del->联系人移除
+//		        if (syncResponse.getDelContactCount() > 0) {
+//		    		onContactsDeleted(syncResponse.getDelContactList());
+//		        }
+//		        onNewMessage(syncResponse);
+//			} catch (InterruptedException | IOException | URISyntaxException e) {
+//				logger.error("msg queue run:", e);
+//				e.printStackTrace();
+//			}
+//		}
     }
     
     public void listen() throws IOException, URISyntaxException {
@@ -104,7 +126,6 @@ public class SyncServie implements Runnable {
             	return;
             } else if (selector == Selector.NEW_MESSAGE.getCode()) {
             	sync();
-//                onNewMessage();
             } else {
                 sync();
             }
@@ -116,16 +137,59 @@ public class SyncServie implements Runnable {
         }
     }
 
-    private SyncResponse sync() throws IOException {
-        SyncResponse syncResponse = wechatHttpService.sync();
-        WechatUtils.checkBaseResponse(syncResponse);
-        cacheService.setSyncKey(syncResponse.getSyncKey());
-        cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
-        MSGS.add(syncResponse);
-//        System.out.println("sync 返回[SyncKey]:"+cacheService.getSyncKey().toString());
-//        System.out.println("sync 返回[SyncCheckKey]:"+cacheService.getSyncCheckKey().toString());
-        return syncResponse;
-    }
+	private void sync() {
+		SyncResponse syncResponse = wechatHttpService.sync(null);
+
+		WechatUtils.checkBaseResponse(syncResponse);
+		cacheService.setSyncKey(syncResponse.getSyncKey());
+		cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
+//        MSGS.add(syncResponse);
+		
+		if (syncResponse.getModContactCount() > 0) {
+
+			syncResponse.getModContactList().forEach(c -> {
+				int hashCode = c.getUserName().hashCode() & Integer.MAX_VALUE;
+				MsgEvent msg = EVENTS.get(hashCode);
+				if (msg == null) {
+					msg = new MsgEvent(hashCode);
+					EVENTS.put(hashCode, msg);
+				}
+				msg.getModContactList().add(c);
+			});
+		}
+		if (syncResponse.getDelContactCount() > 0) {
+
+			syncResponse.getDelContactList().forEach(c -> {
+				int hashCode = c.getUserName().hashCode() & Integer.MAX_VALUE;
+				MsgEvent msg = EVENTS.get(hashCode);
+				if (msg == null) {
+					msg = new MsgEvent(hashCode);
+					EVENTS.put(hashCode, msg);
+				}
+				msg.getDelContactList().add(c);
+			});
+		}
+		for (Message message : syncResponse.getAddMsgList()){
+			int hashCode = message.getFromUserName().hashCode() & Integer.MAX_VALUE;
+			MsgEvent msg = EVENTS.get(hashCode);
+			if (msg == null) {
+				msg = new MsgEvent(hashCode);
+				EVENTS.put(hashCode, msg);
+			}
+			msg.getAddMsgList().add(message);
+		}
+		
+		EVENTS.forEach((k, v) -> {
+			
+			DISRUPTOR.getRingBuffer().publishEvent((event, sequence, data) -> {
+				event.setHash(data.getHash());
+				event.setAddMsgList(data.getAddMsgList());
+				event.setModContactList(data.getModContactList());
+				event.setDelContactList(data.getDelContactList());
+			}, v);
+		});
+		EVENTS.clear();
+	}
 
     private void acceptFriendInvitation(RecommendInfo info) throws IOException, URISyntaxException {
         VerifyUser user = new VerifyUser();
@@ -147,12 +211,12 @@ public class SyncServie implements Runnable {
         		|| (message.getToUserName() != null && message.getToUserName().startsWith("@@"));
     }
 
-    private void onNewMessage(SyncResponse syncResponse) throws IOException, URISyntaxException {
+    public void onNewMessage(Collection<Message> msgs) throws IOException, URISyntaxException {
 //        SyncResponse syncResponse = sync();
     	if (messageHandler == null) {
     		return;
     	}
-    	for (Message message : syncResponse.getAddMsgList()) {
+    	msgs.forEach(message -> {
     		try {
         		//文本消息
         		if (message.getMsgType() == MessageType.TEXT.getCode()) {
@@ -243,7 +307,6 @@ public class SyncServie implements Runnable {
         				messageHandler.postAcceptFriendInvitation(message);
         			} else {
         				logger.info("[*] you've declined the invitation");
-        				//TODO decline invitation
         			}
         		}
         		//状态同步消息
@@ -279,12 +342,11 @@ public class SyncServie implements Runnable {
 									return description;
 								}).toArray(ChatRoomDescription[]::new);
 							if (chatRoomDescriptions.length > 0) {
-								BatchGetContactResponse batchGetContactResponse = wechatHttpService
-										.batchGetContact(chatRoomDescriptions);
-								WechatUtils.checkBaseResponse(batchGetContactResponse);
-								logger.info("[*] batchGetContactResponse count = "
-										+ batchGetContactResponse.getCount());
-								batchGetContactResponse.getContactList().forEach(x -> {
+								BatchGetContactResponse response = wechatHttpService.batchGetContact(chatRoomDescriptions);
+								if(response == null || response.getCount() == 0 || response.getContactList().stream().filter(m -> m.getHeadImgUrl() == null || m.getHeadImgUrl().isEmpty()).count() > 0)
+									break;
+								WechatUtils.checkBaseResponse(response);
+								response.getContactList().forEach(x -> {
 									chatRooms.remove(x);
 									cacheService.getChatRooms().remove(x);
 									cacheService.getChatRooms().add(x);
@@ -359,10 +421,10 @@ public class SyncServie implements Runnable {
     			logger.error("handler exception", e);
 			}
     		
-    	}
+    	});
     }
 
-    private void onContactsModified(Set<Contact> contacts) {
+    public void onContactsModified(Collection<Contact> contacts) {
         Set<Contact> individuals = new HashSet<>();
         Set<Contact> chatRooms = new HashSet<>();
         Set<Contact> mediaPlatforms = new HashSet<>();
@@ -381,11 +443,13 @@ public class SyncServie implements Runnable {
         if (individuals.size() > 0) {
         	ConcurrentLinkedQueue<Contact> existingIndividuals = cacheService.getIndividuals();
             Set<Contact> newIndividuals = individuals.stream().filter(x -> !existingIndividuals.contains(x)).collect(Collectors.toSet());
+            Set<Contact> modifiedIndividuals = new HashSet<>();
             individuals.forEach(x -> {
             	//更新seq唯一值
             	for (Contact c : existingIndividuals) {
-					if(x.equals(c) && !x.getSeq().equals(c.getSeq())){
+					if(x.equals(c) && x.getSeq() != null && !x.getSeq().equals("0") && !x.getSeq().equals(c.getSeq())){
 						seqMap.put(c.getSeq(), x.getSeq());
+						modifiedIndividuals.add(x);
 						break;
 					}
 				}
@@ -394,6 +458,9 @@ public class SyncServie implements Runnable {
             });
             if (messageHandler != null && newIndividuals.size() > 0) {
                 messageHandler.onNewFriendsFound(newIndividuals);
+            }
+            if (messageHandler != null && modifiedIndividuals.size() > 0) {
+                messageHandler.onFriendsModify(modifiedIndividuals);
             }
         }
         //chatroom
@@ -406,8 +473,9 @@ public class SyncServie implements Runnable {
             	Contact existChatRoom = existingChatRooms.stream().filter(c -> c.equals(x)).findFirst().orElse(null);
             	if(existChatRoom != null){
             		//更新seq唯一值
-					if(!x.getSeq().equals(existChatRoom.getSeq()))
+					if(x.getSeq() != null && !x.getSeq().equals("0") && !x.getSeq().equals(existChatRoom.getSeq())){
 						seqMap.put(existChatRoom.getSeq(), x.getSeq());
+					}
 					modifiedChatRooms.add(x);
             	}else{
             		 newChatRooms.add(x);
@@ -425,11 +493,10 @@ public class SyncServie implements Runnable {
 						return description;
 					}).toArray(ChatRoomDescription[]::new);
 				if (chatRoomDescriptions.length > 0) {
-					BatchGetContactResponse batchGetContactResponse = wechatHttpService
-							.batchGetContact(chatRoomDescriptions);
-					WechatUtils.checkBaseResponse(batchGetContactResponse);
-					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
-					batchGetContactResponse.getContactList().forEach(x -> {
+					BatchGetContactResponse response = wechatHttpService.batchGetContact(chatRoomDescriptions);
+					if(response == null || response.getCount() == 0 || response.getContactList().stream().filter(m -> m.getHeadImgUrl() == null || m.getHeadImgUrl().isEmpty()).count() > 0)
+						break;
+					response.getContactList().forEach(x -> {
 						newChatRooms.remove(x);
 						newChatRooms.add(x);
 						existingChatRooms.add(x);
@@ -438,6 +505,10 @@ public class SyncServie implements Runnable {
 					break;
 				}
 			}
+			
+//            //添加新群
+//			if(newChatRooms.size() > 0)
+//				existingChatRooms.addAll(newChatRooms);
 			
             if (messageHandler != null && newChatRooms.size() > 0) {
                 messageHandler.onNewChatRoomsFound(newChatRooms);
@@ -448,42 +519,21 @@ public class SyncServie implements Runnable {
                 if (existingChatRoom == null) {
                     continue;
                 }
-                //获取变动消息中的群主信息
-                existingChatRoom.setChatRoomOwner(chatRoom.getChatRoomOwner());
+                chatRoom.setEncryChatRoomId(existingChatRoom.getEncryChatRoomId());
+                if(chatRoom.getSeq() == null || "0".equals(chatRoom.getSeq()))
+                	chatRoom.setHeadImgUrl(existingChatRoom.getHeadImgUrl());
                 
                 ConcurrentLinkedQueue<Contact> oldMembers = existingChatRoom.getMemberList();
                 ConcurrentLinkedQueue<Contact> newMembers = chatRoom.getMemberList();
                 Set<Contact> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
                 Set<Contact> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
-                oldMembers.removeAll(left);
                 
-                //获取新加入成员头像信息
-                if(joined.size() > 0){
-                	while (true) {
-                		ChatRoomDescription[] chatRoomDescriptions = joined.stream().filter(x -> x.getHeadImgUrl() == null || x.getHeadImgUrl().isEmpty())
-            				.limit(50)
-            				.map(x -> {
-            					ChatRoomDescription description = new ChatRoomDescription();
-            					description.setEncryChatRoomId(chatRoom.getEncryChatRoomId());
-            					description.setUserName(x.getUserName());
-            					return description;
-            				}).toArray(ChatRoomDescription[]::new);
-                		if (chatRoomDescriptions.length > 0) {
-                			BatchGetContactResponse batchGetContactResponse = wechatHttpService.batchGetContact(chatRoomDescriptions);
-                			WechatUtils.checkBaseResponse(batchGetContactResponse);
-                			logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
-                			batchGetContactResponse.getContactList().forEach(x -> {
-//            						chatRoom.getMemberList().remove(x);
-//            						chatRoom.getMemberList().add(x);
-                				joined.remove(x);
-                				joined.add(x);
-                				oldMembers.add(x);
-                			});
-                		} else {
-                			break;
-                		}
-                	}
-                }
+                oldMembers.removeAll(left);
+                oldMembers.addAll(joined);
+                chatRoom.setMemberList(oldMembers);
+                
+                existingChatRooms.remove(existingChatRoom);
+                existingChatRooms.add(chatRoom);
                 
                 if (messageHandler != null) {
                     if (joined.size() > 0 || left.size() > 0) {
@@ -491,7 +541,62 @@ public class SyncServie implements Runnable {
                     }
                 }
             }
+            
+            if (messageHandler != null && modifiedChatRooms.size() > 0) {
+                messageHandler.onChatRoomsModify(modifiedChatRooms);
+            }
+            
+//            for (Contact chatRoom : modifiedChatRooms) {
+//                Contact existingChatRoom = existingChatRooms.stream().filter(x -> x.getUserName().equals(chatRoom.getUserName())).findFirst().orElse(null);
+//                if (existingChatRoom == null) {
+//                    continue;
+//                }
+//                //获取变动消息中的群主信息
+//                existingChatRoom.setChatRoomOwner(chatRoom.getChatRoomOwner());
+//                existingChatRoom.setNickName(chatRoom.getNickName());
+//                
+//                ConcurrentLinkedQueue<Contact> oldMembers = existingChatRoom.getMemberList();
+//                ConcurrentLinkedQueue<Contact> newMembers = chatRoom.getMemberList();
+//                Set<Contact> joined = newMembers.stream().filter(x -> !oldMembers.contains(x)).collect(Collectors.toSet());
+//                Set<Contact> left = oldMembers.stream().filter(x -> !newMembers.contains(x)).collect(Collectors.toSet());
+//                oldMembers.removeAll(left);
+//                
+//                //获取新加入成员头像信息
+//                if(joined.size() > 0){
+//                	while (true) {
+//                		ChatRoomDescription[] chatRoomDescriptions = joined.stream().filter(x -> x.getHeadImgUrl() == null || x.getHeadImgUrl().isEmpty())
+//            				.limit(50)
+//            				.map(x -> {
+//            					ChatRoomDescription description = new ChatRoomDescription();
+//            					description.setEncryChatRoomId(existingChatRoom.getEncryChatRoomId());
+//            					description.setUserName(x.getUserName());
+//            					return description;
+//            				}).toArray(ChatRoomDescription[]::new);
+//                		if (chatRoomDescriptions.length > 0) {
+//                			BatchGetContactResponse batchGetContactResponse = wechatHttpService.batchGetContact(chatRoomDescriptions);
+//                			if(batchGetContactResponse.getCount() == 0)
+//            					break;
+//                			WechatUtils.checkBaseResponse(batchGetContactResponse);
+//                			logger.info("[joined] batchGetContactResponse count = " + batchGetContactResponse.getCount());
+//                			batchGetContactResponse.getContactList().forEach(x -> {
+//                				joined.remove(x);
+//                				joined.add(x);
+//                				oldMembers.add(x);
+//                			});
+//                		} else {
+//                			break;
+//                		}
+//                	}
+//                }
+//                
+//                if (messageHandler != null) {
+//                    if (joined.size() > 0 || left.size() > 0) {
+//                        messageHandler.onChatRoomMembersChanged(chatRoom, joined, left);
+//                    }
+//                }
+//            }
         }
+        
         if (mediaPlatforms.size() > 0) {
             //media platform
         	ConcurrentLinkedQueue<Contact> existingPlatforms = cacheService.getMediaPlatforms();
@@ -510,7 +615,7 @@ public class SyncServie implements Runnable {
         }
     }
 
-    private void onContactsDeleted(Set<Contact> contacts) {
+    public void onContactsDeleted(Collection<Contact> contacts) {
         Set<Contact> individuals = new HashSet<>();
         Set<Contact> chatRooms = new HashSet<>();
         Set<Contact> mediaPlatforms = new HashSet<>();

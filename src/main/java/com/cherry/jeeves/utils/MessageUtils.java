@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class MessageUtils {
     public static String getChatRoomTextMessageContent(String content) {
         if (content == null) {
-            throw new IllegalArgumentException("content");
+            return null;
         }
         return content.replaceAll("^(@([0-9]|[a-z])+):", "")
                 .replaceAll("<br/>", "\r\n");
