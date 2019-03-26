@@ -37,15 +37,16 @@ import com.cherry.jeeves.enums.RetCode;
 import com.cherry.jeeves.enums.Selector;
 import com.cherry.jeeves.enums.StatusNotifyCode;
 import com.cherry.jeeves.service.disruptor.MsgEvent;
-import com.cherry.jeeves.service.disruptor.MsgHandler;
 import com.cherry.jeeves.utils.WechatUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 
 @Component
-public class SyncServie implements Runnable {
+public class SyncServie {
     private static final Logger logger = LoggerFactory.getLogger(SyncServie.class);
     @Autowired
     private CacheService cacheService;
@@ -64,9 +65,10 @@ public class SyncServie implements Runnable {
     private String WECHAT_URL_GET_MEDIA;
     
 //    private final static String RED_PACKET_CONTENT = "收到红包，请在手机上查看";
+    private final ObjectMapper jsonMapper = new ObjectMapper();
     
 	//Disruptor环形数组队列大小
-	private static final int BUFFER_SIZE = 1024 * 1024;
+	private static final int BUFFER_SIZE = 128;
 	
 	private static final Map<Integer, MsgEvent> EVENTS = new HashMap<>();
 	
@@ -77,18 +79,6 @@ public class SyncServie implements Runnable {
         if (messageHandler == null) {
             this.messageHandler = new DefaultMessageHandler();
         }
-    }
-    
-    @Override
-    public void run() {
-    	MsgHandler[] handlers = new MsgHandler[10];
-    	for (int i = 0; i < handlers.length; i++) {
-    		handlers[i] = new MsgHandler(i+1, handlers.length, this);
-		}
-    	DISRUPTOR.handleEventsWith(handlers).then((event, sequence, endOfBatch) -> {
-			event.clear();
-		});
-    	DISRUPTOR.start();
     }
     
     public void listen() throws IOException, URISyntaxException {
@@ -118,7 +108,7 @@ public class SyncServie implements Runnable {
 
 	private void sync() {
 		SyncResponse syncResponse = wechatHttpService.sync(null);
-
+		logger.debug(String.format("[SYNC DONE] syncResponse msg count= %s", syncResponse.getAddMsgCount()));
 		WechatUtils.checkBaseResponse(syncResponse);
 		cacheService.setSyncKey(syncResponse.getSyncKey());
 		cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
@@ -158,7 +148,11 @@ public class SyncServie implements Runnable {
 		}
 		
 		EVENTS.forEach((k, v) -> {
-			
+			try {
+				logger.debug(String.format("[EVENT MSG] %s", jsonMapper.writeValueAsString(v)));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 			DISRUPTOR.getRingBuffer().publishEvent((event, sequence, data) -> {
 				event.setHash(data.getHash());
 				event.setAddMsgList(data.getAddMsgList());
@@ -166,6 +160,7 @@ public class SyncServie implements Runnable {
 				event.setDelContactList(data.getDelContactList());
 			}, v);
 		});
+		logger.debug(String.format("[PUT EVENTS DONE] DISRUPTOR range = %s", (DISRUPTOR.getRingBuffer().getMinimumGatingSequence() + "-" + DISRUPTOR.getRingBuffer().getCursor())));
 		EVENTS.clear();
 	}
 
@@ -396,7 +391,7 @@ public class SyncServie implements Runnable {
 					}
         		}
     		} catch (Exception e) {
-    			logger.error("handler exception", e);
+    			logger.error("onNewMessage exception", e);
 			}
     		
     	});
@@ -421,13 +416,12 @@ public class SyncServie implements Runnable {
         if (individuals.size() > 0) {
         	ConcurrentLinkedQueue<Contact> existingIndividuals = cacheService.getIndividuals();
             Set<Contact> newIndividuals = individuals.stream().filter(x -> !existingIndividuals.contains(x)).collect(Collectors.toSet());
-            Set<Contact> modifiedIndividuals = new HashSet<>();
+            Set<Contact> modifiedIndividuals = individuals.stream().filter(x -> existingIndividuals.contains(x)).collect(Collectors.toSet());
             individuals.forEach(x -> {
             	//更新seq唯一值
             	for (Contact c : existingIndividuals) {
 					if(x.equals(c) && x.getSeq() != null && !x.getSeq().equals("0") && !x.getSeq().equals(c.getSeq())){
 						seqMap.put(c.getSeq(), x.getSeq());
-						modifiedIndividuals.add(x);
 						break;
 					}
 				}

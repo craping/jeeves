@@ -1,9 +1,14 @@
 package com.cherry.jeeves.service.disruptor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.cherry.jeeves.service.SyncServie;
 import com.lmax.disruptor.EventHandler;
 
 public class MsgHandler implements EventHandler<MsgEvent> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MsgHandler.class);
 	
 	private final long ordinal;
 	
@@ -32,7 +37,10 @@ public class MsgHandler implements EventHandler<MsgEvent> {
 				service.onNewMessage(event.getAddMsgList());
 			} catch (Exception e) {
 				e.printStackTrace();
+				logger.error("[EVENT HANDLER ERROR]", e);
 			} finally {
+				logger.debug("[EVENT HANDLER DONE]");
+				event.clear();
 			}
 		}
 	}

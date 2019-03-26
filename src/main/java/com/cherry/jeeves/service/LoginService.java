@@ -25,6 +25,7 @@ import com.cherry.jeeves.enums.LoginCode;
 import com.cherry.jeeves.enums.StatusNotifyCode;
 import com.cherry.jeeves.exception.WechatException;
 import com.cherry.jeeves.exception.WechatQRExpiredException;
+import com.cherry.jeeves.service.disruptor.MsgHandler;
 import com.cherry.jeeves.utils.WechatUtils;
 
 @Component
@@ -184,9 +185,13 @@ public class LoginService {
 			syncServie.getMessageHandler().onContactCompleted();
 			
 			//消息队列监听启动
-			Thread msgThread = new Thread(syncServie);
-			msgThread.setDaemon(true);
-			msgThread.start();
+			MsgHandler[] handlers = new MsgHandler[10];
+	    	for (int i = 0; i < handlers.length; i++) {
+	    		handlers[i] = new MsgHandler(i+1, handlers.length, syncServie);
+			}
+	    	SyncServie.DISRUPTOR.handleEventsWith(handlers);
+	    	SyncServie.DISRUPTOR.start();
+	    	
 			
 			cacheService.setAlive(true);
 			logger.info("[*] login process completed");
