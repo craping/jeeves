@@ -187,7 +187,7 @@ public class LoginService {
 			//消息队列监听启动
 			MsgHandler[] handlers = new MsgHandler[10];
 	    	for (int i = 0; i < handlers.length; i++) {
-	    		handlers[i] = new MsgHandler(i+1, handlers.length, syncServie);
+	    		handlers[i] = new MsgHandler(i, handlers.length, syncServie);
 			}
 	    	SyncServie.DISRUPTOR.handleEventsWith(handlers);
 	    	SyncServie.DISRUPTOR.start();

@@ -36,6 +36,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -98,6 +100,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 @Component
 class WechatHttpServiceInternal {
+	private static final Logger logger = LoggerFactory.getLogger(WechatHttpServiceInternal.class);
 	
 	 /**
      * 上传媒体文件分片大小
@@ -476,8 +479,7 @@ class WechatHttpServiceInternal {
         request.setList(list);
         HttpHeaders customHeader = createPostCustomHeader();
         HeaderUtils.assign(customHeader, postHeader);
-        ResponseEntity<String> responseEntity
-                = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
         try {
 			return jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), BatchGetContactResponse.class);
 		} catch (IOException e) {
@@ -547,6 +549,7 @@ class WechatHttpServiceInternal {
      * @throws IOException if the http response body can't be convert to {@link SyncResponse}
      */
     SyncResponse sync(SyncRequest request) {
+    	 logger.debug("[SYNC START]");
     	BaseRequest baseRequest = cacheService.getBaseRequest();
 //    	if(cacheService.getSyncKey() != null && cacheService.getSyncCheckKey() != null) {
 //	    	System.out.println("sync 请求[SyncKey]:"+cacheService.getSyncKey().toString());
@@ -562,16 +565,19 @@ class WechatHttpServiceInternal {
 			}
 	        HttpHeaders customHeader = createPostCustomHeader();
 	        HeaderUtils.assign(customHeader, postHeader);
-	        CookieStore store = (CookieStore) ((StatefullRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
-	        cookies = store.getCookies().stream().collect(Collectors.toMap(Cookie::getName, Cookie::getValue, (k1, k2)-> k2));
+//	        CookieStore store = (CookieStore) ((StatefullRestTemplate) restTemplate).getHttpContext().getAttribute(HttpClientContext.COOKIE_STORE);
+//	        cookies = store.getCookies().stream().collect(Collectors.toMap(Cookie::getName, Cookie::getValue, (k1, k2)-> k2));
 	        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, customHeader), String.class);
+	        logger.debug("[SYNC REQUEST]");
 	        SyncResponse response = jsonMapper.readValue(WechatUtils.textDecode(responseEntity.getBody()), SyncResponse.class);
+	        logger.debug(String.format("[SYNC RESULT] response = %s", response));
 	        if(response == null){
-				 System.out.println("获取消息为空，重新获取"+response);
+	        	 logger.debug("获取消息为空，重新获取");
 				 return sync(request);
 			 }
 	        return response;
 		} catch (IOException e) {
+			logger.error("[SYNC ERROR]", e);
 			e.printStackTrace();
 			return sync(request);
 		}

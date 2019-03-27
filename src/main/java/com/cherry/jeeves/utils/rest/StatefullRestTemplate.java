@@ -29,10 +29,14 @@ public class StatefullRestTemplate extends RestTemplate {
     
     StatefullRestTemplate(HttpContext httpContext) {
         super();
-        httpClient = HttpClientBuilder.create().build();
+        httpClient = HttpClientBuilder.create()
+                .setMaxConnPerRoute(25)
+                .setMaxConnTotal(50).build();
         this.httpContext = httpContext == null ? new BasicHttpContext() : httpContext;
         StatefullHttpComponentsClientHttpRequestFactory statefullHttpComponentsClientHttpRequestFactory = new StatefullHttpComponentsClientHttpRequestFactory(httpClient, httpContext);
-        statefullHttpComponentsClientHttpRequestFactory.setConnectTimeout(35000);
+        statefullHttpComponentsClientHttpRequestFactory.setConnectTimeout(2000);
+        statefullHttpComponentsClientHttpRequestFactory.setReadTimeout(35000);
+        
         super.setRequestFactory(statefullHttpComponentsClientHttpRequestFactory);
         List<HttpMessageConverter<?>> converters = this.getMessageConverters();
         

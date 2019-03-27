@@ -24,7 +24,7 @@ public class MsgHandler implements EventHandler<MsgEvent> {
 	
 	@Override
 	public void onEvent(MsgEvent event, long sequence, boolean endOfBatch) throws Exception {
-		if (Math.abs((event.getHash() % (numberOfConsumers+1))) == ordinal){
+		if (event.getHash() % numberOfConsumers == ordinal){
 			try {
 				// mod包含新增和修改
 				if (event.getModContactList().size() > 0) {

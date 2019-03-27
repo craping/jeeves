@@ -38,8 +38,6 @@ import com.cherry.jeeves.enums.Selector;
 import com.cherry.jeeves.enums.StatusNotifyCode;
 import com.cherry.jeeves.service.disruptor.MsgEvent;
 import com.cherry.jeeves.utils.WechatUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -65,7 +63,6 @@ public class SyncServie {
     private String WECHAT_URL_GET_MEDIA;
     
 //    private final static String RED_PACKET_CONTENT = "收到红包，请在手机上查看";
-    private final ObjectMapper jsonMapper = new ObjectMapper();
     
 	//Disruptor环形数组队列大小
 	private static final int BUFFER_SIZE = 128;
@@ -146,13 +143,8 @@ public class SyncServie {
 			}
 			msg.getAddMsgList().add(message);
 		}
-		
 		EVENTS.forEach((k, v) -> {
-			try {
-				logger.debug(String.format("[EVENT MSG] %s", jsonMapper.writeValueAsString(v)));
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
+			logger.debug(String.format("[PUT EVENTS] event hash = %s", k));
 			DISRUPTOR.getRingBuffer().publishEvent((event, sequence, data) -> {
 				event.setHash(data.getHash());
 				event.setAddMsgList(data.getAddMsgList());
@@ -191,6 +183,22 @@ public class SyncServie {
     	}
     	msgs.forEach(message -> {
     		try {
+    			//如果群列表不在最近聊天中则拉取
+    			if (isMessageFromChatRoom(message)) {
+    				String chatRoomUserName = message.getFromUserName().contains("@@")?message.getFromUserName():message.getToUserName();
+    				if(cacheService.getChatRoom(chatRoomUserName) == null){
+    					ChatRoomDescription description = new ChatRoomDescription();
+    					description.setUserName(chatRoomUserName);
+    		    		ChatRoomDescription[] descriptions = new ChatRoomDescription[]{description};
+    		    		BatchGetContactResponse response = wechatHttpService.batchGetContact(descriptions);
+    		    		
+    		    		for (Contact c : response.getContactList()) {
+    		    			cacheService.getChatRooms().add(c);
+    					}
+    		    		messageHandler.onStatusNotifySyncConv(message);
+    				}
+    			}
+    			
         		//文本消息
         		if (message.getMsgType() == MessageType.TEXT.getCode()) {
         			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
