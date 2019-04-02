@@ -3,7 +3,11 @@ package com.cherry.jeeves.service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -130,11 +134,16 @@ public class LoginService {
 				syncServie.getMessageHandler().onLogin(initResponse.getUser());
 			}).start();
 			//8 status notify
-			StatusNotifyResponse statusNotifyResponse =
-					wechatHttpServiceInternal.statusNotify(cacheService.getOwner().getUserName(), StatusNotifyCode.INITED.getCode());
-			WechatUtils.checkBaseResponse(statusNotifyResponse);
+			new Thread(() -> {
+				try {
+					StatusNotifyResponse statusNotifyResponse = wechatHttpServiceInternal.statusNotify(cacheService.getOwner().getUserName(), StatusNotifyCode.INITED.getCode());
+					WechatUtils.checkBaseResponse(statusNotifyResponse);
+					logger.info("[8] status notify completed");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}).start();
 			
-			logger.info("[8] status notify completed");
 			//9 get contact
 			long seq = 0;
 			do {
@@ -147,6 +156,8 @@ public class LoginService {
 				cacheService.getMediaPlatforms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isMediaPlatform).collect(Collectors.toSet()));
 				cacheService.getChatRooms().addAll(getContactResponse.getMemberList().stream().filter(WechatUtils::isChatRoom).collect(Collectors.toSet()));
 			} while (seq > 0);
+			syncServie.getMessageHandler().onContactCompleted();
+			logger.info("[9] get contact completed");
 			
 			Set<Contact> initChatRooms =  Arrays.stream(initResponse.getChatSet().split(","))
 			.filter(x -> x != null && x.startsWith("@@")).map(x -> {
@@ -155,12 +166,13 @@ public class LoginService {
 				return contact;
 			}).filter(c -> !cacheService.getChatRooms().contains(c)).collect(Collectors.toSet());
 			cacheService.getChatRooms().addAll(initChatRooms);
-			logger.info("[9] get contact completed");
 			//10 batch get contact
 			
+			int count = 0;
+			List<CompletableFuture<BatchGetContactResponse>> futures = new LinkedList<>();
 			while(true){
 				ChatRoomDescription[] chatRoomDescriptions = cacheService.getChatRooms().stream()
-					.filter(c -> c.getEncryChatRoomId() == null || c.getEncryChatRoomId().isEmpty())
+					.skip(count*50)
 					.limit(50)
 					.map(x -> {
 						ChatRoomDescription description = new ChatRoomDescription();
@@ -169,20 +181,29 @@ public class LoginService {
 					})
 					.toArray(ChatRoomDescription[]::new);
 				if (chatRoomDescriptions.length > 0) {
-					BatchGetContactResponse batchGetContactResponse = wechatHttpServiceInternal.batchGetContact(chatRoomDescriptions);
-					WechatUtils.checkBaseResponse(batchGetContactResponse);
-					logger.info("[*] batchGetContactResponse count = " + batchGetContactResponse.getCount());
-					batchGetContactResponse.getContactList().forEach(x -> {
-						cacheService.getChatRooms().remove(x);
-						cacheService.getChatRooms().add(x);
-		            });
-//					cacheService.getChatRooms().addAll(batchGetContactResponse.getContactList());
+					futures.add(CompletableFuture.supplyAsync(() -> {
+						return wechatHttpServiceInternal.batchGetContact(chatRoomDescriptions);
+					}));
+					count++;
 				} else {
 					break;
 				}
 			}
-			logger.info("[10] batch get contact completed");
-			syncServie.getMessageHandler().onContactCompleted();
+			
+			AtomicBoolean completed = new AtomicBoolean(false);
+			WechatUtils.sequence(futures).thenAccept(list -> {
+				list.forEach(response -> {
+					if(response != null) {
+						response.getContactList().forEach(x -> {
+							cacheService.getChatRooms().remove(x);
+							cacheService.getChatRooms().add(x);
+			            });
+					}
+				});
+				logger.info("[10] batch get contact completed");
+				syncServie.getMessageHandler().onStatusNotifySyncConv(null);
+				completed.set(true);
+			});
 			
 			//消息队列监听启动
 			MsgHandler[] handlers = new MsgHandler[10];
@@ -202,7 +223,8 @@ public class LoginService {
 					logger.info("[Logout] exit bye");
 					return;
 				}
-				syncServie.listen();
+				if(completed.get())
+					syncServie.listen();
 			}
 			logger.info("[*] exit bye");
 		} catch (IOException | URISyntaxException ex) {

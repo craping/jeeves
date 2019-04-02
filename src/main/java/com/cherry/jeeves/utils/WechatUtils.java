@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WechatUtils {
     public static void checkBaseResponse(WechatHttpResponseBase response) {
@@ -45,6 +49,20 @@ public class WechatUtils {
         return contact.getUserName().startsWith("@") && !contact.getUserName().startsWith("@@") && ((contact.getVerifyFlag() & 8) > 0);
     }
     
+    public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
+		
+		CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		
+		return allDoneFuture.thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.<T>toList()));
+	}
+ 
+	public static <T> CompletableFuture<List<T>> sequence(Stream<CompletableFuture<T>> futures) {
+
+		List<CompletableFuture<T>> futureList = futures.filter(f -> f != null).collect(Collectors.toList());
+
+		return sequence(futureList);
+	}
+	
     /**
      * 从文件中获取二进制数据
      *
