@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,6 @@ public class SyncServie {
             //有新消息
         	if (selector == Selector.NORMAL.getCode()) {
             	return;
-            } else if (selector == Selector.NEW_MESSAGE.getCode()) {
-            	sync();
             } else {
                 sync();
             }
@@ -105,10 +104,13 @@ public class SyncServie {
 
 	private void sync() {
 		SyncResponse syncResponse = wechatHttpService.sync(null);
-		logger.debug(String.format("[SYNC DONE] syncResponse msg count= %s", syncResponse.getAddMsgCount()));
+		logger.debug(String.format("[SYNC DONE] syncResponse msg count=%s; mod count=%s; del count=%s;", syncResponse.getAddMsgCount(), syncResponse.getModContactCount(), syncResponse.getDelContactCount()));
 		WechatUtils.checkBaseResponse(syncResponse);
+		logger.debug("[SYNC CHECK]");
 		cacheService.setSyncKey(syncResponse.getSyncKey());
 		cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
+		EVENTS.clear();
+		logger.debug(String.format("[EVENTS CLEAR] events size= %s", EVENTS.size()));
 		
 		if (syncResponse.getModContactCount() > 0) {
 
@@ -121,7 +123,9 @@ public class SyncServie {
 				}
 				msg.getModContactList().add(c);
 			});
+			logger.debug(String.format("[MOD DONE] events size= %s", EVENTS.size()));
 		}
+		
 		if (syncResponse.getDelContactCount() > 0) {
 
 			syncResponse.getDelContactList().forEach(c -> {
@@ -133,7 +137,9 @@ public class SyncServie {
 				}
 				msg.getDelContactList().add(c);
 			});
+			logger.debug(String.format("[DEL DONE] events size= %s", EVENTS.size()));
 		}
+		
 		for (Message message : syncResponse.getAddMsgList()){
 			int hashCode = message.getFromUserName().hashCode() & Integer.MAX_VALUE;
 			MsgEvent msg = EVENTS.get(hashCode);
@@ -142,7 +148,9 @@ public class SyncServie {
 				EVENTS.put(hashCode, msg);
 			}
 			msg.getAddMsgList().add(message);
+			logger.debug(String.format("[MSG DONE] events size= %s", EVENTS.size()));
 		}
+		
 		EVENTS.forEach((k, v) -> {
 			logger.debug(String.format("[PUT EVENTS] event hash = %s", k));
 			DISRUPTOR.getRingBuffer().publishEvent((event, sequence, data) -> {
@@ -153,7 +161,6 @@ public class SyncServie {
 			}, v);
 		});
 		logger.debug(String.format("[PUT EVENTS DONE] DISRUPTOR range = %s", (DISRUPTOR.getRingBuffer().getMinimumGatingSequence() + "-" + DISRUPTOR.getRingBuffer().getCursor())));
-		EVENTS.clear();
 	}
 
     private void acceptFriendInvitation(RecommendInfo info) throws IOException, URISyntaxException {
@@ -177,7 +184,6 @@ public class SyncServie {
     }
 
     public void onNewMessage(Collection<Message> msgs) throws IOException, URISyntaxException {
-//        SyncResponse syncResponse = sync();
     	if (messageHandler == null) {
     		return;
     	}
@@ -201,7 +207,6 @@ public class SyncServie {
     			
         		//文本消息
         		if (message.getMsgType() == MessageType.TEXT.getCode()) {
-        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
         			//群
         			if (isMessageFromChatRoom(message)) {
         				messageHandler.onReceivingChatRoomTextMessage(message);
@@ -214,7 +219,6 @@ public class SyncServie {
         		} 
         		//图片
         		else if (message.getMsgType() == MessageType.IMAGE.getCode() || message.getAppMsgType() == AppMessageType.IMG.getCode()) {
-        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
         			String fullImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
         			String thumbImageUrl = fullImageUrl + "&type=slave";
         			//群
@@ -228,7 +232,6 @@ public class SyncServie {
         		} 
         		//表情
         		else if (message.getMsgType() == MessageType.EMOTICON.getCode() || message.getAppMsgType() == AppMessageType.EMOJI.getCode()) {
-        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
         			String emoticonUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
         			emoticonUrl = emoticonUrl + "&type=big";
         			//群
@@ -242,7 +245,6 @@ public class SyncServie {
         		}
         		//语音消息
         		else if (message.getMsgType() == MessageType.VOICE.getCode()) {
-        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
         			String voiceUrl = String.format(WECHAT_URL_GET_VOICE, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
         			//群
         			if (isMessageFromChatRoom(message)) {
@@ -255,7 +257,6 @@ public class SyncServie {
         		}
         		//视频消息
         		else if (message.getMsgType() == MessageType.VIDEO.getCode() || message.getMsgType() == MessageType.MICROVIDEO.getCode()) {
-        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
         			String videoUrl = String.format(WECHAT_URL_GET_VIDEO, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey());
         			String thumbImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey()) + "&type=slave";
         			//群
@@ -269,8 +270,11 @@ public class SyncServie {
         		}
         		//多媒体(文件)消息
         		else if (message.getMsgType() == MessageType.APP.getCode()) {
-        			cacheService.getContactNamesWithUnreadMessage().add(message.getFromUserName());
-        			String mediaUrl = String.format(WECHAT_URL_GET_MEDIA, cacheService.getFileUrl(), message.getFromUserName(), message.getMediaId(), escape(message.getFileName()), cacheService.getPassTicket());
+        			String mediaUrl;
+        			if(message.getAppMsgType() == AppMessageType.URL.getCode())
+        				mediaUrl = StringEscapeUtils.unescapeHtml4(message.getUrl());
+        			else
+        				mediaUrl = String.format(WECHAT_URL_GET_MEDIA, cacheService.getFileUrl(), message.getFromUserName(), message.getMediaId(), escape(message.getFileName()), cacheService.getPassTicket());
         			//群
         			if (isMessageFromChatRoom(message)) {
         				messageHandler.onReceivingChatRoomMediaMessage(message, mediaUrl);

@@ -307,15 +307,15 @@ public class WechatHttpService {
      * @param userName the contact with whom I need to set the messages read.
      * @throws IOException if statusNotify fails.
      */
-    private void notifyNecessary(String toUserName) throws IOException {
+    public void notifyNecessary(String toUserName) throws IOException {
         if (toUserName == null) {
             throw new IllegalArgumentException("userName");
         }
-        Set<String> unreadContacts = cacheService.getContactNamesWithUnreadMessage();
-        if (unreadContacts.contains(toUserName)) {
-            wechatHttpServiceInternal.statusNotify(toUserName, StatusNotifyCode.READED.getCode());
-            unreadContacts.remove(toUserName);
-        }
+        wechatHttpServiceInternal.statusNotify(toUserName, StatusNotifyCode.READED.getCode());
+//        Set<String> unreadContacts = cacheService.getContactNamesWithUnreadMessage();
+//        if (unreadContacts.contains(toUserName)) {
+//            unreadContacts.remove(toUserName);
+//        }
     }
 
     public Map<String, String> getCookies() {

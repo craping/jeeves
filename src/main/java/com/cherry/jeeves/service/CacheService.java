@@ -1,7 +1,5 @@
 package com.cherry.jeeves.service;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.springframework.stereotype.Component;
@@ -51,8 +49,6 @@ public class CacheService {
     private ConcurrentLinkedQueue<Contact> individuals = new ConcurrentLinkedQueue<>();
     private ConcurrentLinkedQueue<Contact> mediaPlatforms = new ConcurrentLinkedQueue<>();
     private ConcurrentLinkedQueue<Contact> chatRooms = new ConcurrentLinkedQueue<>();
-
-    private Set<String> contactNamesWithUnreadMessage = new HashSet<>();
 
     public boolean isAlive() {
         return alive;
@@ -169,10 +165,6 @@ public class CacheService {
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
-    }
-
-    public Set<String> getContactNamesWithUnreadMessage() {
-        return contactNamesWithUnreadMessage;
     }
 
 	public void setIndividuals(ConcurrentLinkedQueue<Contact> individuals) {
