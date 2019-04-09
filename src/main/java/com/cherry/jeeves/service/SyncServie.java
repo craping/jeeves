@@ -270,6 +270,7 @@ public class SyncServie {
         		}
         		//多媒体(文件)消息
         		else if (message.getMsgType() == MessageType.APP.getCode()) {
+        			String thumbImageUrl = String.format(WECHAT_URL_GET_MSG_IMG, cacheService.getHostUrl(), message.getMsgId(), cacheService.getsKey()) + "&type=slave";
         			String mediaUrl;
         			if(message.getAppMsgType() == AppMessageType.URL.getCode())
         				mediaUrl = StringEscapeUtils.unescapeHtml4(message.getUrl());
@@ -277,11 +278,11 @@ public class SyncServie {
         				mediaUrl = String.format(WECHAT_URL_GET_MEDIA, cacheService.getFileUrl(), message.getFromUserName(), message.getMediaId(), escape(message.getFileName()), cacheService.getPassTicket());
         			//群
         			if (isMessageFromChatRoom(message)) {
-        				messageHandler.onReceivingChatRoomMediaMessage(message, mediaUrl);
+        				messageHandler.onReceivingChatRoomMediaMessage(message, thumbImageUrl, mediaUrl);
         			}
         			//个人
         			else if (isMessageFromIndividual(message)) {
-        				messageHandler.onReceivingPrivateMediaMessage(message, mediaUrl);
+        				messageHandler.onReceivingPrivateMediaMessage(message, thumbImageUrl, mediaUrl);
         			}
         		}
         		//好友邀请

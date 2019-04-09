@@ -104,7 +104,7 @@ public interface MessageHandler {
      * @param message		消息体
      * @param mediaUrl 		文件链接
      */
-    void onReceivingChatRoomMediaMessage(Message message, String mediaUrl);
+    void onReceivingChatRoomMediaMessage(Message message, String thumbImageUrl, String mediaUrl);
     
     
     
@@ -163,7 +163,7 @@ public interface MessageHandler {
      * @param message		消息体
      * @param mediaUrl 		文件链接
      */
-    void onReceivingPrivateMediaMessage(Message message, String mediaUrl);
+    void onReceivingPrivateMediaMessage(Message message, String thumbImageUrl, String mediaUrl);
     
     
     

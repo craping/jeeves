@@ -65,61 +65,50 @@ public class WechatHttpService {
      * @throws IOException if sendText fails
      */
     public SendMsgResponse sendText(String userName, String content) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendText(userName, content);
     }
     
     
     public SendMsgResponse sendImage(String userName, String imgUrl) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendImage(userName, imgUrl);
     }
     public SendMsgResponse sendImage(String userName, UploadMediaResponse media, int scene) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendImage(userName, media, scene);
     }
     
     
     
     public SendMsgResponse sendEmoticon(String userName, String emoticonUrl) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendEmoticon(userName, emoticonUrl);
     }
     public SendMsgResponse sendEmoticon(String userName, UploadMediaResponse media, int scene) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendEmoticon(userName, media, scene);
     }
     
     
     
     public SendMsgResponse sendVideo(String userName, String videoUrl) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendVideo(userName, videoUrl);
     }
     public SendMsgResponse sendVideo(String userName, UploadMediaResponse media, int scene) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendVideo(userName, media, scene);
     }
     
     
     
     public SendMsgResponse sendApp(String userName, String mediaUrl) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendApp(userName, mediaUrl);
     }
     public SendMsgResponse sendApp(String userName, UploadMediaResponse media, int scene) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.sendApp(userName, media, scene);
     }
     
     
     
     public SendMsgResponse forwardMsg(String userName, Message message) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.forwardMsg(userName, message);
     }
     public SendMsgResponse forwardAttachMsg(String userName, UploadMediaResponse media, MessageType msgType) throws IOException {
-        notifyNecessary(userName);
         return wechatHttpServiceInternal.forwardAttachMsg(userName, media, msgType);
     }
     

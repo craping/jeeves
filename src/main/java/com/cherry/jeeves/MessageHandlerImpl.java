@@ -121,7 +121,7 @@ public class MessageHandlerImpl implements MessageHandler {
 	}
 
 	@Override
-	public void onReceivingChatRoomMediaMessage(Message message, String mediaUrl) {
+	public void onReceivingChatRoomMediaMessage(Message message, String thumbImageUrl, String mediaUrl) {
 		logger.info("群聊多媒体消息");
 		logger.info("from chatroom: " + message.getFromUserName());
 		logger.info("from person: " + MessageUtils.getSenderOfChatRoomTextMessage(message.getContent()));
@@ -209,7 +209,7 @@ public class MessageHandlerImpl implements MessageHandler {
 	}
 
 	@Override
-	public void onReceivingPrivateMediaMessage(Message message, String mediaUrl) {
+	public void onReceivingPrivateMediaMessage(Message message, String thumbImageUrl, String mediaUrl) {
 		logger.info("私聊多媒体消息");
 		logger.info("mediaUrl:" + mediaUrl);
 		

@@ -106,7 +106,7 @@ public class DefaultMessageHandler implements MessageHandler {
 	}
 
 	@Override
-	public void onReceivingChatRoomMediaMessage(Message message, String mediaUrl) {
+	public void onReceivingChatRoomMediaMessage(Message message, String thumbImageUrl, String mediaUrl) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -130,7 +130,7 @@ public class DefaultMessageHandler implements MessageHandler {
 	}
 
 	@Override
-	public void onReceivingPrivateMediaMessage(Message message, String mediaUrl) {
+	public void onReceivingPrivateMediaMessage(Message message, String thumbImageUrl, String mediaUrl) {
 		// TODO Auto-generated method stub
 		
 	}
