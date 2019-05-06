@@ -105,7 +105,8 @@ public class SyncServie {
 	private void sync() {
 		SyncResponse syncResponse = wechatHttpService.sync(null);
 		logger.debug(String.format("[SYNC DONE] syncResponse msg count=%s; mod count=%s; del count=%s;", syncResponse.getAddMsgCount(), syncResponse.getModContactCount(), syncResponse.getDelContactCount()));
-		WechatUtils.checkBaseResponse(syncResponse);
+		logger.debug(String.format("[SYNC DONE] syncResponse ret=%s; errMsg=%s;", syncResponse.getBaseResponse().getRet(), syncResponse.getBaseResponse().getErrMsg()));
+//		WechatUtils.checkBaseResponse(syncResponse);
 		logger.debug("[SYNC CHECK]");
 		cacheService.setSyncKey(syncResponse.getSyncKey());
 		cacheService.setSyncCheckKey(syncResponse.getSyncCheckKey());
